@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.BuildingsMapper">
+
+    <resultMap id="BaseResultMap" type="com.utm.what2do.model.entity.Buildings">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property="lat" column="lat" />
+            <result property="lng" column="lng" />
+            <result property="campus_zone" column="campus_zone" />
+            <result property="category" column="category" />
+            <result property="created_at" column="created_at" />
+            <result property="updated_at" column="updated_at" />
+            <result property="deleted" column="deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,lat,lng,campus_zone,category,
+        created_at,updated_at,deleted
+    </sql>
+</mapper>

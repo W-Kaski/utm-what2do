@@ -12,6 +12,7 @@ import FeedPage from '@/pages/FeedPage.vue';
 import PostDetailPage from '@/pages/PostDetailPage.vue';
 import PostCreatePage from '@/pages/PostCreatePage.vue';
 import SearchPage from '@/pages/SearchPage.vue';
+import UserDetailPage from '@/pages/UserDetailPage.vue';
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -26,7 +27,8 @@ const routes = [
   { path: '/feed', name: 'feed', component: FeedPage },
   { path: '/post/:id', name: 'post-detail', component: PostDetailPage, props: true },
   { path: '/post/create', name: 'post-create', component: PostCreatePage },
-  { path: '/search', name: 'search', component: SearchPage }
+  { path: '/search', name: 'search', component: SearchPage },
+  { path: '/users/:id', name: 'user-detail', component: UserDetailPage, props: true }
 ];
 
 const router = createRouter({

@@ -4,7 +4,9 @@ export const mockPosts = [
     author: {
       id: 'user-1',
       name: 'UTM Dev Club',
-      avatar: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80',
+      type: 'club',
+      clubId: 'f1-paddock'
     },
     createdAt: '2024-07-20T08:30:00Z',
     content:
@@ -55,7 +57,9 @@ export const mockPosts = [
     author: {
       id: 'user-3',
       name: 'SAGE UTM',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+      type: 'club',
+      clubId: 'uni-mapping'
     },
     createdAt: '2024-07-19T15:10:00Z',
     content:

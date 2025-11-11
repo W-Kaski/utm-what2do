@@ -1,10 +1,10 @@
 <template>
   <article class="post-card">
     <header class="post-header">
-      <button class="avatar" type="button" @click="goToProfile(post.author.id)">
+      <button class="avatar" type="button" @click="goToProfile(post.author)">
         <img :src="post.author.avatar" :alt="post.author.name" />
       </button>
-      <div class="author-info">
+      <div class="author-info" @click="goToProfile(post.author)">
         <strong>{{ post.author.name }}</strong>
         <p>{{ relativeTime }}</p>
       </div>
@@ -147,8 +147,19 @@ const handleRepost = () => {
   alert('转发功能将连接到发布窗口，敬请期待。');
 };
 
-const goToProfile = (id) => {
-  router.push({ name: 'profile', query: { user: id } });
+const goToProfile = (author) => {
+  if (!author) return;
+  if (author.type === 'club' && author.clubId) {
+    router.push({ name: 'club-detail', params: { id: author.clubId } });
+    return;
+  }
+  if (author.type === 'user' && author.id) {
+    router.push({ name: 'user-detail', params: { id: author.id } });
+    return;
+  }
+  if (author.id) {
+    router.push({ name: 'user-detail', params: { id: author.id } });
+  }
 };
 
 const openLightbox = (index) => {
