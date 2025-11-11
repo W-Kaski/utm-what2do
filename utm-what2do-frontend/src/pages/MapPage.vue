@@ -1,4 +1,4 @@
-<template>
+y<template>
   <section class="map-page">
     <header class="hero">
       <div class="search-shell">
