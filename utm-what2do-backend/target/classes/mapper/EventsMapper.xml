@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.EventsMapper">
+
+    <resultMap id="BaseResultMap" type="com.utm.what2do.model.entity.Events">
+            <id property="id" column="id" />
+            <result property="title" column="title" />
+            <result property="slug" column="slug" />
+            <result property="description_long" column="description_long" />
+            <result property="start_date" column="start_date" />
+            <result property="start_time" column="start_time" />
+            <result property="end_time" column="end_time" />
+            <result property="building_id" column="building_id" />
+            <result property="room" column="room" />
+            <result property="club_id" column="club_id" />
+            <result property="cover_url" column="cover_url" />
+            <result property="is_official" column="is_official" />
+            <result property="registration_notes" column="registration_notes" />
+            <result property="views_count" column="views_count" />
+            <result property="likes_count" column="likes_count" />
+            <result property="created_at" column="created_at" />
+            <result property="updated_at" column="updated_at" />
+            <result property="deleted" column="deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,slug,description_long,start_date,start_time,
+        end_time,building_id,room,club_id,cover_url,
+        is_official,registration_notes,views_count,likes_count,created_at,
+        updated_at,deleted
+    </sql>
+</mapper>
