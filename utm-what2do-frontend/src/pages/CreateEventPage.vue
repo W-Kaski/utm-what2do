@@ -1,19 +1,19 @@
 <template>
   <section class="create">
-    <h2>创建活动</h2>
-    <p>在接入后端 API 前，这里展示表单骨架供后续开发。</p>
+    <h2>Create event</h2>
+    <p>This is a placeholder form until we wire it up to the backend API.</p>
     <form @submit.prevent>
-      <label>活动名称<input type="text" placeholder="请输入活动名称" /></label>
-      <label>日期<input type="date" /></label>
-      <label>地点<input type="text" placeholder="活动地点" /></label>
-      <label>简介<textarea rows="4" placeholder="活动介绍"></textarea></label>
-      <button type="submit">提交活动</button>
+      <label>Event name<input type="text" placeholder="Enter the event name" /></label>
+      <label>Date<input type="date" /></label>
+      <label>Location<input type="text" placeholder="Event location" /></label>
+      <label>Description<textarea rows="4" placeholder="Event description"></textarea></label>
+      <button type="submit">Submit event</button>
     </form>
   </section>
 </template>
 
 <script setup>
-// 表单逻辑与 API 集成后续补充
+// Form logic and API integration will be added later.
 </script>
 
 <style scoped>

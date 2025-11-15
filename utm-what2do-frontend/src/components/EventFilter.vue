@@ -1,6 +1,6 @@
 <template>
   <section class="filters">
-    <input v-model="searchTerm" type="text" placeholder="搜索活动或社团" />
+    <input v-model="searchTerm" type="text" placeholder="Search events or clubs" />
     <div class="tags">
       <button
         v-for="tag in availableTags"
@@ -11,7 +11,7 @@
         {{ tag }}
       </button>
     </div>
-    <button class="clear" @click="clear">清空筛选</button>
+    <button class="clear" @click="clear">Clear filters</button>
   </section>
 </template>
 
@@ -22,7 +22,7 @@ import { useFilterStore } from '@/stores/filters';
 const filterStore = useFilterStore();
 const { selectedTags, searchTerm } = storeToRefs(filterStore);
 
-const availableTags = ['技术', '社交', '竞赛', '音乐'];
+const availableTags = ['Tech', 'Social', 'Competition', 'Music'];
 
 function toggle(tag) {
   filterStore.toggleTag(tag);

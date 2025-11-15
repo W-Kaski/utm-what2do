@@ -1,7 +1,7 @@
 <template>
   <section class="profile-page">
     <div class="cover" :style="coverStyle">
-      <button type="button" class="cover-btn" @click="triggerCoverUpload">更换封面</button>
+      <button type="button" class="cover-btn" @click="triggerCoverUpload">Change cover</button>
       <input
         ref="coverInput"
         class="sr-only"
@@ -34,34 +34,34 @@
 
     <section v-if="activeTab === 'favorites'" class="panel">
       <header class="panel-header">
-        <h2>收藏的活动</h2>
-        <p>{{ favoriteEvents.length }} 个活动</p>
+        <h2>Saved events</h2>
+        <p>{{ favoriteEvents.length }} events</p>
       </header>
       <div v-if="favoriteEvents.length" class="favorites-grid">
         <EventCard v-for="event in favoriteEvents" :key="event.id" :event="event" />
       </div>
       <div v-else class="empty">
-        <p>暂时还没有收藏，去活动页点亮小星星吧。</p>
-        <RouterLink class="primary" :to="{ name: 'events' }">前往活动</RouterLink>
+        <p>No favorites yet. Head over to the events page and tap the star icon.</p>
+        <RouterLink class="primary" :to="{ name: 'events' }">Browse events</RouterLink>
       </div>
     </section>
 
     <section v-else class="panel settings">
       <header class="panel-header">
-        <h2>设置</h2>
-        <p>管理你的个人资料</p>
+        <h2>Settings</h2>
+        <p>Manage your profile</p>
       </header>
       <div class="setting-field">
-        <label>昵称</label>
+        <label>Display name</label>
         <input v-model="editableName" type="text" />
       </div>
       <div class="setting-field">
-        <label>简介</label>
+        <label>Bio</label>
         <textarea v-model="editableBio" rows="3"></textarea>
       </div>
       <div class="actions">
-        <button type="button" class="primary" @click="applyProfileChanges">保存</button>
-        <button type="button" class="ghost" @click="resetProfileChanges">重置</button>
+        <button type="button" class="primary" @click="applyProfileChanges">Save</button>
+        <button type="button" class="ghost" @click="resetProfileChanges">Reset</button>
       </div>
     </section>
   </section>
@@ -85,7 +85,7 @@ const fallbackAvatar =
 
 const user = computed(() => ({
   name: userStore.name || 'UTM Explorer',
-  bio: userStore.bio || '沉浸式探索校园活动，收藏你喜欢的灵感瞬间。',
+  bio: userStore.bio || 'Immerse yourself in campus events and save your favorite sparks of inspiration.',
   avatar: userStore.avatar || fallbackAvatar
 }));
 
@@ -95,8 +95,8 @@ const editableName = ref(user.value.name);
 const editableBio = ref(user.value.bio);
 
 const tabs = [
-  { id: 'favorites', label: '收藏', icon: '⭐' },
-  { id: 'settings', label: '设置', icon: '⚙️' }
+  { id: 'favorites', label: 'Favorites', icon: '⭐' },
+  { id: 'settings', label: 'Settings', icon: '⚙️' }
 ];
 
 const coverStyle = computed(() => ({

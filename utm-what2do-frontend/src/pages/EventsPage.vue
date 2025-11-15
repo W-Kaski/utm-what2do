@@ -2,14 +2,14 @@
   <div class="events-page">
     <section class="search-section">
       <form class="search-form" @submit.prevent="submitSearch">
-        <label class="sr-only" for="events-search">搜索活动</label>
+        <label class="sr-only" for="events-search">Search events</label>
         <input
           id="events-search"
           v-model="localSearch"
           type="search"
-          placeholder="输入关键词（例如：音乐会、工作坊、技术）"
+          placeholder="Enter keywords (for example: concert, workshop, tech)"
         />
-        <button type="submit">搜索</button>
+        <button type="submit">Search</button>
       </form>
       <div class="search-actions">
         <button type="button" class="ghost-btn" @click="toggleFilters">
@@ -24,8 +24,8 @@
 
     <section v-if="showFilters" class="panel filter-panel">
       <header>
-        <h3>标签筛选</h3>
-        <button type="button" @click="clearFilters">清空</button>
+        <h3>Tag filters</h3>
+        <button type="button" @click="clearFilters">Clear</button>
       </header>
       <div class="tag-list">
         <button
@@ -41,7 +41,7 @@
     </section>
 
     <section v-if="showSort" class="panel sort-panel">
-      <h3>排序方式</h3>
+      <h3>Sort order</h3>
       <ul>
         <li v-for="option in sortOptions" :key="option.value">
           <label>
@@ -59,14 +59,14 @@
 
     <div class="result-headline">
       <div>
-        <p class="eyebrow">搜索结果</p>
+        <p class="eyebrow">Search results</p>
         <h2>
-          <span v-if="searchTerm">“{{ searchTerm }}” · </span>
-          共 {{ filteredEvents.length }} 场活动
+          <span v-if="searchTerm">"{{ searchTerm }}" · </span>
+          Total {{ filteredEvents.length }} events
         </h2>
       </div>
       <button v-if="hasActiveFilters" type="button" class="clear-btn" @click="resetAll">
-        清除筛选
+        Clear filters
       </button>
     </div>
 
@@ -75,9 +75,9 @@
     </section>
 
     <div v-else class="empty-state">
-      <h3>暂时没有符合条件的活动</h3>
-      <p>尝试修改关键词或筛选条件，或稍后再来查看新的活动。</p>
-      <button type="button" @click="resetAll">重置搜索</button>
+      <h3>No events match yet</h3>
+      <p>Try changing keywords or filters, or check back for new activities soon.</p>
+      <button type="button" @click="resetAll">Reset search</button>
     </div>
   </div>
 </template>
@@ -93,11 +93,11 @@ import { useFilterStore } from '@/stores/filters';
 
 import { HOT_EVENT_THRESHOLD, HOT_EVENT_TAG, OFFICIAL_TAG } from '@/constants/highlights';
 
-const availableTags = ['技术', '社交', '竞赛', '音乐', HOT_EVENT_TAG, OFFICIAL_TAG];
+const availableTags = ['Tech', 'Social', 'Competition', 'Music', HOT_EVENT_TAG, OFFICIAL_TAG];
 const sortOptions = [
-  { value: 'soonest', label: '时间最近' },
-  { value: 'latest', label: '时间最晚' },
-  { value: 'name', label: '名称 A-Z' }
+  { value: 'soonest', label: 'Soonest' },
+  { value: 'latest', label: 'Latest' },
+  { value: 'name', label: 'Name A-Z' }
 ];
 
 const eventStore = useEventStore();
@@ -116,7 +116,7 @@ const filterCount = computed(() => selectedTags.value.length);
 const hasActiveFilters = computed(() => filterStore.hasActiveFilters);
 const sortLabel = computed(() => {
   const current = sortOptions.find((option) => option.value === sortBy.value);
-  return current ? current.label : '时间最近';
+  return current ? current.label : 'Soonest';
 });
 
 watch(searchTerm, (value) => {
@@ -177,7 +177,7 @@ const filteredEvents = computed(() => {
   if (sortBy.value === 'latest') {
     sorted.sort((a, b) => getTimeValue(b.date, -Infinity) - getTimeValue(a.date, -Infinity));
   } else if (sortBy.value === 'name') {
-    sorted.sort((a, b) => a.title.localeCompare(b.title, 'zh-Hans-CN'));
+    sorted.sort((a, b) => a.title.localeCompare(b.title, 'en'));
   } else {
     sorted.sort((a, b) => getTimeValue(a.date, Infinity) - getTimeValue(b.date, Infinity));
   }

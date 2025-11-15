@@ -5,7 +5,7 @@ const mockEvents = [
   {
     id: '1',
     title: 'Weaving Connections: Extractive Colonialism in Africa',
-    description: '第二场 “Weaving Connections” 系列，聚焦环境正义与资源开采的关系。',
+    description: 'The second "Weaving Connections" session centers on environmental justice and resource extraction.',
     longDescription:
       "We're excited to announce the second part of our series, 'Weaving Connections' — this time discussing environmental injustice in Africa and how imperialism and resource extraction play roles in societal injustice. Register with the QR code or bio link and stay tuned for our amazing speakers!",
     date: '2024-11-07',
@@ -34,24 +34,24 @@ const mockEvents = [
   },
   {
     id: '2',
-    title: '湖畔音乐会',
-    description: '在湖边享受现场音乐、美食与夏夜微风。',
+    title: 'Lakeside Music Night',
+    description: 'Enjoy live music, great food, and the summer breeze beside the lake.',
     longDescription:
-      '加入我们在南校区湖畔举办的沉浸式音乐之夜，集合原声乐队与 DJ 联合演出。活动提供野餐席位与艺术装置，欢迎携友前来，感受夏日氛围。',
+      'Join us on South Field for an immersive evening of music featuring acoustic bands and DJ sets. Picnic seating and art installations are available, so bring friends and soak up the summer vibe.',
     date: '2024-07-25',
     startTime: '18:30',
     endTime: '21:00',
     club: 'UTM Music Society',
     clubId: 'anime-club',
-    tags: ['音乐', '社交', 'Outdoor'],
+    tags: ['Music', 'Social', 'Outdoor'],
     location: 'South Field',
     locationId: 'dv-field',
     coverImage:
       'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80',
-    registration: ['免费入场，请提前预约席位', '欢迎携带野餐垫与可重复使用的杯具'],
+    registration: ['Free entry - please reserve your spot in advance.', 'Feel free to bring picnic blankets and reusable cups.'],
     organizer: {
       name: 'UTM Music Society',
-      description: '学生自发的音乐社群，策划开放麦、乐队联演与音乐工作坊。',
+      description: 'Student-led music community curating open mics, band collaborations, and music workshops.',
       avatar:
         'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80',
       clubId: 'anime-club',

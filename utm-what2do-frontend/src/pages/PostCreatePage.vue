@@ -3,27 +3,27 @@
     <FeedSidebar active="create" @home="goHome" @following="goFollowing" />
     <section class="post-create">
       <header>
-        <h1>发布动态</h1>
+        <h1>Create a post</h1>
       </header>
 
       <form class="editor" @submit.prevent="submitPost">
       <textarea
         v-model="content"
         maxlength="500"
-        placeholder="分享你在校园的灵感、活动或灵光一现..."
+        placeholder="Share your campus ideas, events, or sparks of inspiration..."
       ></textarea>
       <div class="counter">{{ content.length }}/500</div>
 
       <div class="media-controls">
         <label>
           <input type="file" accept="image/*" multiple @change="handleImages" :disabled="videoFile" />
-          上传图片
+          Upload images
         </label>
         <label>
           <input type="file" accept="video/*" @change="handleVideo" :disabled="imageFiles.length" />
-          上传视频
+          Upload video
         </label>
-        <span class="hint">最多 9 张图片或 1 个视频（100MB 内）</span>
+        <span class="hint">Up to 9 images or 1 video (under 100MB)</span>
       </div>
 
       <div class="preview-grid" v-if="imagePreviews.length">
@@ -35,11 +35,11 @@
 
       <div v-if="videoPreview" class="video-preview">
         <video controls :src="videoPreview"></video>
-        <button type="button" @click="removeVideo">移除</button>
+        <button type="button" @click="removeVideo">Remove</button>
       </div>
 
         <button class="submit" type="submit" :disabled="!content.trim() && !imageFiles.length && !videoFile">
-        发布
+        Post
       </button>
       </form>
     </section>

@@ -10,7 +10,7 @@ export const mockPosts = [
     },
     createdAt: '2024-07-20T08:30:00Z',
     content:
-      'Hack Sprint 报名最后 48 小时！今年主题聚焦“AI + Campus”，提供整夜导师陪跑与 XR 体验区。欢迎所有专业的同学参加，记得自带电脑。',
+      '48 hours left to register for Hack Sprint! This year\'s theme focuses on "AI + Campus" with overnight mentor support and an XR experience zone. Students from every major are welcome, just remember to bring your laptop.',
     media: {
       type: 'images',
       items: [
@@ -24,7 +24,7 @@ export const mockPosts = [
     reposts: 9,
     liked: false,
     isFollowing: false,
-    tags: ['热度', '黑客松'],
+    tags: ['Trending', 'Hackathon'],
     commentsThread: [
       {
         id: 'c-1',
@@ -33,7 +33,7 @@ export const mockPosts = [
           name: 'Zoey',
           avatar: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80'
         },
-        content: '导师名单会公布吗？想提前了解主题方向～',
+        content: 'Will the mentor list be posted? I want to get a sense of the themes ahead of time.',
         createdAt: '2024-07-20T10:20:00Z',
         likes: 4,
         replies: [
@@ -44,7 +44,7 @@ export const mockPosts = [
               name: 'UTM Dev Club',
               avatar: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80'
             },
-            content: '会的！今晚在 IG 发布第一批导师，敬请关注。',
+            content: 'Yes! We are sharing the first mentor batch on IG tonight, so stay tuned.',
             createdAt: '2024-07-20T11:00:00Z',
             likes: 6
           }
@@ -63,7 +63,7 @@ export const mockPosts = [
     },
     createdAt: '2024-07-19T15:10:00Z',
     content:
-      'Weaving Connections 第二场活动将邀请可持续农业与社会公正领域的嘉宾。我们将准备互动式圆桌讨论，期待你的参与！',
+      'The second Weaving Connections event features guests working in sustainable agriculture and social justice. We are planning interactive roundtables and cannot wait to have you there!',
     media: {
       type: 'video',
       items: ['https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4'],
@@ -74,7 +74,7 @@ export const mockPosts = [
     reposts: 21,
     liked: true,
     isFollowing: true,
-    tags: ['官方', '学校辅导'],
+    tags: ['Official', 'Student support'],
     commentsThread: [
       {
         id: 'c-2',
@@ -83,7 +83,7 @@ export const mockPosts = [
           name: 'Noah',
           avatar: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=200&q=80'
         },
-        content: '请问报名后能获得讲座资料吗？',
+        content: 'Will we be able to access the presentation materials after registering?',
         createdAt: '2024-07-19T16:00:00Z',
         likes: 3,
         replies: []

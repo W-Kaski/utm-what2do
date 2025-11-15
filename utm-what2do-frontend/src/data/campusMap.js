@@ -8,13 +8,13 @@ export const campusBuildings = [
       {
         id: '1',
         title: 'Weaving Connections',
-        time: '11月7日 · 15:00',
+        time: 'Nov 7 · 15:00',
         club: 'SAGE UTM'
       },
       {
         id: '2',
         title: 'AI Ethics Forum',
-        time: '11月9日 · 10:00',
+        time: 'Nov 9 · 10:00',
         club: 'Dev Club'
       }
     ]
@@ -28,25 +28,25 @@ export const campusBuildings = [
       {
         id: '3',
         title: 'Data Viz Workshop',
-        time: '7月24日 · 13:00',
+        time: 'Jul 24 · 13:00',
         club: 'Mapping Lab'
       },
       {
         id: '10',
         title: 'Cloud Native Crash Course',
-        time: '7月28日 · 15:30',
+        time: 'Jul 28 · 15:30',
         club: 'DevOps Circle'
       },
       {
         id: '11',
         title: 'Sustainability Talk',
-        time: '8月3日 · 11:00',
+        time: 'Aug 3 · 11:00',
         club: 'Green UTM'
       },
       {
         id: '12',
         title: 'Exam Prep Marathon',
-        time: '8月5日 · 09:00',
+        time: 'Aug 5 · 09:00',
         club: 'Scholars Hub'
       }
     ]
@@ -57,9 +57,9 @@ export const campusBuildings = [
     coords: [43.5467, -79.6633],
     tag: 'social',
     events: [
-      { id: '4', title: 'Sunset Concert', time: '7月25日 · 18:30', club: 'Music Society' },
-      { id: '5', title: 'Board Game Night', time: '7月26日 · 19:00', club: 'Uni D&D Club' },
-      { id: '14', title: 'Poetry Slam', time: '7月27日 · 17:00', club: 'Arts Collective' }
+      { id: '4', title: 'Sunset Concert', time: 'Jul 25 · 18:30', club: 'Music Society' },
+      { id: '5', title: 'Board Game Night', time: 'Jul 26 · 19:00', club: 'Uni D&D Club' },
+      { id: '14', title: 'Poetry Slam', time: 'Jul 27 · 17:00', club: 'Arts Collective' }
     ]
   },
   {
@@ -68,7 +68,7 @@ export const campusBuildings = [
     coords: [43.54612, -79.66462],
     tag: 'outdoor',
     events: [
-      { id: '6', title: 'Lakeside Music Fest', time: '8月1日 · 19:00', club: 'Music Society' }
+      { id: '6', title: 'Lakeside Music Fest', time: 'Aug 1 · 19:00', club: 'Music Society' }
     ]
   },
   {
@@ -77,18 +77,18 @@ export const campusBuildings = [
     coords: [43.54698, -79.6626],
     tag: 'tech',
     events: [
-      { id: '7', title: 'Hack Sprint', time: '8月12日 · 09:00', club: 'Dev Club' },
-      { id: '8', title: 'XR Lab Demo', time: '8月15日 · 14:00', club: 'XR Collective' },
-      { id: '9', title: 'Product Jam', time: '8月20日 · 12:00', club: 'Entrepreneurship Hub' },
-      { id: '13', title: 'AI Studio Showcase', time: '8月22日 · 16:00', club: 'AI Studio' }
+      { id: '7', title: 'Hack Sprint', time: 'Aug 12 · 09:00', club: 'Dev Club' },
+      { id: '8', title: 'XR Lab Demo', time: 'Aug 15 · 14:00', club: 'XR Collective' },
+      { id: '9', title: 'Product Jam', time: 'Aug 20 · 12:00', club: 'Entrepreneurship Hub' },
+      { id: '13', title: 'AI Studio Showcase', time: 'Aug 22 · 16:00', club: 'AI Studio' }
     ]
   }
 ];
 
 export const filterTags = [
-  { id: 'all', label: '全部' },
-  { id: 'academic', label: '学术' },
-  { id: 'tech', label: '科技' },
-  { id: 'social', label: '社交' },
-  { id: 'outdoor', label: '户外' }
+  { id: 'all', label: 'All' },
+  { id: 'academic', label: 'Academic' },
+  { id: 'tech', label: 'Tech' },
+  { id: 'social', label: 'Social' },
+  { id: 'outdoor', label: 'Outdoor' }
 ];

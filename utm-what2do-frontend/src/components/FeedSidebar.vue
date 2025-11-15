@@ -8,10 +8,10 @@
         🔍 Search
       </button>
       <button type="button" :class="{ active: active === 'following' }" @click="goFollowing">
-        👥 关注
+        👥 Following
       </button>
       <button type="button" :class="{ active: active === 'create' }" @click="goCreate">
-        ✏️ 发布
+        ✏️ Create
       </button>
     </nav>
   </aside>

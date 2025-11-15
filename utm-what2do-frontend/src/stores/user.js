@@ -8,7 +8,7 @@ const defaultAvatar =
 export const useUserStore = defineStore('user', {
   state: () => ({
     name: 'UTM Explorer',
-    bio: '让灵感随时发生 · 探索校园、收藏喜爱的活动',
+    bio: 'Let inspiration spark anytime - explore campus and save the events you love',
     coverImage: defaultCover,
     avatar: defaultAvatar,
     favorites: []

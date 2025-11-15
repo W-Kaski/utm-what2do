@@ -5,9 +5,9 @@
     <section class="feed-content">
       <header class="feed-header">
         <div class="tabs">
-          <button type="button" :class="{ active: activeTab === 'all' }" @click="setTab('all')">推荐</button>
+          <button type="button" :class="{ active: activeTab === 'all' }" @click="setTab('all')">For you</button>
           <button type="button" :class="{ active: activeTab === 'following' }" @click="setTab('following')">
-            关注
+            Following
           </button>
         </div>
       </header>

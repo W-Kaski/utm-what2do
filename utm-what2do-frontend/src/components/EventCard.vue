@@ -7,7 +7,7 @@
     <p class="excerpt">{{ event.description }}</p>
     <footer>
       <span class="location">{{ event.location }}</span>
-      <RouterLink :to="`/events/${event.id}`" class="ghost-link">查看详情 →</RouterLink>
+      <RouterLink :to="`/events/${event.id}`" class="ghost-link">View details →</RouterLink>
     </footer>
   </article>
 </template>
@@ -24,8 +24,8 @@ const props = defineProps({
 });
 
 const formattedDate = computed(() => {
-  if (!props.event.date) return '日期待定';
-  const formatter = new Intl.DateTimeFormat('zh-CN', {
+  if (!props.event.date) return 'Date TBD';
+  const formatter = new Intl.DateTimeFormat('en-CA', {
     month: 'long',
     day: 'numeric'
   });

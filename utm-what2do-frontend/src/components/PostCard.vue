@@ -9,7 +9,7 @@
         <p>{{ relativeTime }}</p>
       </div>
       <button type="button" class="follow-btn" @click.stop="toggleFollow">
-        {{ post.isFollowing ? '已关注' : '关注' }}
+        {{ post.isFollowing ? 'Following' : 'Follow' }}
       </button>
       <button type="button" class="icon-btn">···</button>
     </header>
@@ -19,7 +19,7 @@
         <span v-if="isCollapsed">{{ truncatedText }}</span>
         <span v-else>{{ post.content }}</span>
         <button v-if="shouldTruncate" type="button" class="inline-link" @click.stop="toggleText">
-          {{ isCollapsed ? '展开' : '收起' }}
+          {{ isCollapsed ? 'See more' : 'See less' }}
         </button>
       </p>
 
@@ -117,10 +117,10 @@ const relativeTime = computed(() => {
   const value = props.post.createdAt ? new Date(props.post.createdAt) : new Date();
   const diff = Date.now() - value.getTime();
   const hours = Math.round(diff / (1000 * 60 * 60));
-  if (hours < 1) return '刚刚';
-  if (hours < 24) return `${hours} 小时前`;
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours} hours ago`;
   const days = Math.round(hours / 24);
-  return `${days} 天前`;
+  return `${days} days ago`;
 });
 
 const toggleText = () => {
@@ -144,7 +144,7 @@ const toggleFollow = () => {
 };
 
 const handleRepost = () => {
-  alert('转发功能将连接到发布窗口，敬请期待。');
+  alert('Repost will connect to the compose window soon, stay tuned.');
 };
 
 const goToProfile = (author) => {

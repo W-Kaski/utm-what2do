@@ -7,13 +7,13 @@
         <input
           v-model="query"
           type="search"
-          placeholder="搜索动态 / 用户 / 标签 / 活动"
+          placeholder="Search posts / users / tags / events"
           @focus="showSuggestions = true"
           @keyup.enter="handleSearch"
         />
-        <button class="primary-btn" type="button" @click="handleSearch">搜索</button>
+        <button class="primary-btn" type="button" @click="handleSearch">Search</button>
         <div v-if="showSuggestions && suggestions.length" class="suggestions">
-          <p>智能推荐</p>
+          <p>Smart suggestions</p>
           <button
             v-for="suggestion in suggestions"
             :key="suggestion.value"
@@ -54,18 +54,18 @@
             <h3>{{ club.name }}</h3>
             <p>{{ club.tagline }}</p>
           </div>
-          <span>{{ club.stats.members }} 名成员</span>
+          <span>{{ club.stats.members }} members</span>
         </article>
       </template>
 
       <template v-else-if="activeTab === 'tags'">
         <article v-for="tag in filteredTags" :key="tag.name" class="tag-card" @click="goToTag(tag.name)">
           <strong>#{{ tag.name }}</strong>
-          <p>{{ tag.count }} 条动态 · {{ tag.views }} 次浏览</p>
+          <p>{{ tag.count }} posts · {{ tag.views }} views</p>
         </article>
       </template>
 
-        <p v-if="!hasResults" class="empty-state">未找到相关结果，换个关键词试试。</p>
+        <p v-if="!hasResults" class="empty-state">No results found. Try another keyword.</p>
       </div>
     </section>
   </div>
@@ -89,9 +89,9 @@ const suggestions = ref([]);
 const activeTab = ref('posts');
 
 const tabs = [
-  { id: 'posts', label: '动态' },
-  { id: 'users', label: '用户' },
-  { id: 'tags', label: '标签' }
+  { id: 'posts', label: 'Posts' },
+  { id: 'users', label: 'Users' },
+  { id: 'tags', label: 'Tags' }
 ];
 
 const filteredPosts = computed(() => {

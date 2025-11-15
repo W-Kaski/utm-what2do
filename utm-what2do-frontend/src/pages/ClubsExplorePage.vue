@@ -23,20 +23,20 @@
       <header class="explore-header">
         <div>
           <p class="eyebrow">Explore Clubs</p>
-          <h1>寻找让你热血的社团</h1>
+          <h1>Find the communities that fuel you</h1>
         </div>
-        <span class="result-count">{{ filteredClubs.length }} 个结果</span>
+        <span class="result-count">{{ filteredClubs.length }} results</span>
       </header>
 
       <div class="search-bar">
-        <label class="sr-only" for="club-search">搜索社团</label>
+        <label class="sr-only" for="club-search">Search clubs</label>
         <input
           id="club-search"
           v-model="search"
           type="search"
           placeholder="What would you like to explore?"
         />
-        <button type="button" @click="resetFilters">重置</button>
+        <button type="button" @click="resetFilters">Reset</button>
       </div>
 
       <div class="club-list">
@@ -80,7 +80,7 @@ const search = ref('');
 
 const hotFilterActive = computed(() => {
   const filter = typeof route.query.filter === 'string' ? route.query.filter : '';
-  return filter === '热门社团' || filter === 'hot';
+  return filter === 'hot-clubs' || filter === 'hot';
 });
 
 const selectedCategory = ref(hotFilterActive.value ? null : clubCategories[0]?.id ?? null);

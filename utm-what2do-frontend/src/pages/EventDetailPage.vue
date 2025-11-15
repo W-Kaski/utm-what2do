@@ -2,9 +2,9 @@
   <section v-if="event" class="event-detail">
     <div class="detail-shell">
       <div class="top-bar">
-        <button type="button" class="back-chip" aria-label="返回" @click="goBack">
+        <button type="button" class="back-chip" aria-label="Go back" @click="goBack">
           <span aria-hidden="true" class="arrow">←</span>
-          返回
+          Back
         </button>
       </div>
 
@@ -21,7 +21,7 @@
               type="button"
               class="star-btn"
               :class="{ active: isFavorited }"
-              aria-label="收藏活动"
+              aria-label="Save event"
               @click="toggleFavorite"
             >
               ★
@@ -64,7 +64,7 @@
           <span class="section-icon">📝</span>
           <div>
             <p class="section-eyebrow">Registration</p>
-            <h2>报名方式</h2>
+            <h2>How to register</h2>
           </div>
         </header>
         <ul class="bullet-list">
@@ -77,7 +77,7 @@
           <span class="section-icon">💬</span>
           <div>
             <p class="section-eyebrow">Description</p>
-            <h2>活动介绍</h2>
+            <h2>Event overview</h2>
           </div>
         </header>
         <p class="description">{{ longDescription }}</p>
@@ -88,7 +88,7 @@
           <span class="section-icon">🏛️</span>
           <div>
             <p class="section-eyebrow">Organizer</p>
-            <h2>主办方</h2>
+            <h2>Organizer</h2>
           </div>
         </header>
         <div class="organizer-card">
@@ -102,7 +102,7 @@
                 v-if="organizer.clubId"
                 :to="{ name: 'club-detail', params: { id: organizer.clubId } }"
               >
-                查看社团
+                View club
               </RouterLink>
             </div>
           </div>
@@ -111,9 +111,9 @@
     </div>
   </section>
   <section v-else class="empty-state">
-    <h2>未找到该活动</h2>
-    <p>活动可能已下线，请返回重新选择。</p>
-    <RouterLink class="back-link" :to="{ name: 'events' }">返回活动列表</RouterLink>
+    <h2>Event not found</h2>
+    <p>The event may have been removed. Please head back and pick another one.</p>
+    <RouterLink class="back-link" :to="{ name: 'events' }">Back to events</RouterLink>
   </section>
 </template>
 
@@ -142,18 +142,18 @@ const buildDateTime = (date, time) => {
 
 const schedule = computed(() => {
   if (!event.value) {
-    return { date: '待定', time: '待定' };
+    return { date: 'TBD', time: 'TBD' };
   }
   const dateText = formatDate(event.value.date);
   const start = buildDateTime(event.value.date, event.value.startTime);
   const end = buildDateTime(event.value.date, event.value.endTime);
   const formatter = new Intl.DateTimeFormat('en-CA', { hour: 'numeric', minute: '2-digit' });
-  const timeText = start && end ? `${formatter.format(start)} – ${formatter.format(end)}` : '时间待定';
+  const timeText = start && end ? `${formatter.format(start)} – ${formatter.format(end)}` : 'Time TBD';
   return { date: dateText, time: timeText };
 });
 
 const registrationItems = computed(() => event.value?.registration || []);
-const longDescription = computed(() => event.value?.longDescription || event.value?.description || '暂无介绍');
+const longDescription = computed(() => event.value?.longDescription || event.value?.description || 'Details coming soon');
 const organizer = computed(() => event.value?.organizer);
 
 const fallbackCover =

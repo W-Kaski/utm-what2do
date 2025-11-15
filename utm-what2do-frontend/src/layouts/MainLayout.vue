@@ -8,17 +8,17 @@
         </RouterLink>
 
         <nav class="primary-nav" aria-label="Primary Navigation">
-          <RouterLink to="/">首页</RouterLink>
-          <RouterLink to="/events">活动</RouterLink>
-          <RouterLink to="/map">地图</RouterLink>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/events">Events</RouterLink>
+          <RouterLink to="/map">Map</RouterLink>
           <RouterLink :to="{ name: 'feed' }" :class="{ 'router-link-active': communityActive }">
-            社区
+            Community
           </RouterLink>
-          <RouterLink to="/profile">个人中心</RouterLink>
+          <RouterLink to="/profile">Profile</RouterLink>
         </nav>
 
         <div class="header-actions">
-          <RouterLink to="/events/new" class="pill-link">发布活动</RouterLink>
+          <RouterLink to="/events/new" class="pill-link">Create Event</RouterLink>
 
           <div class="profile" ref="menuRef">
             <button
@@ -36,10 +36,10 @@
               v-if="menuOpen"
               class="dropdown"
               role="menu"
-              aria-label="用户菜单"
+              aria-label="User menu"
             >
               <div class="dropdown__header">
-                <p>欢迎回来</p>
+                <p>Welcome back</p>
                 <strong>UTM Explorer</strong>
               </div>
               <div class="dropdown__body">
@@ -48,11 +48,11 @@
                   role="menuitem"
                   @click="closeMenu"
                 >
-                  个人主页
+                  View profile
                 </RouterLink>
-                <button type="button" role="menuitem" @click="handleAction('login')">登录 / 切换账户</button>
-                <button type="button" role="menuitem" @click="handleAction('settings')">设置</button>
-                <button type="button" role="menuitem" @click="handleAction('logout')">退出登录</button>
+                <button type="button" role="menuitem" @click="handleAction('login')">Sign in / Switch account</button>
+                <button type="button" role="menuitem" @click="handleAction('settings')">Settings</button>
+                <button type="button" role="menuitem" @click="handleAction('logout')">Sign out</button>
               </div>
             </div>
           </div>

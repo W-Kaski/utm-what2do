@@ -1,13 +1,13 @@
 <template>
   <section v-if="post" class="post-detail">
-    <button class="back-btn" type="button" @click="goBack">← 返回动态</button>
+    <button class="back-btn" type="button" @click="goBack">← Back to feed</button>
     <PostCard :post="post" :collapsible="false" @open-detail.prevent />
 
     <div class="comment-section">
-      <h3>评论 · {{ post.commentsThread.length }}</h3>
+      <h3>Comments · {{ post.commentsThread.length }}</h3>
       <form class="comment-form" @submit.prevent="submitComment">
-        <input v-model="commentContent" type="text" maxlength="200" placeholder="发表你的看法..." />
-        <button type="submit" :disabled="!commentContent.trim()">发送</button>
+        <input v-model="commentContent" type="text" maxlength="200" placeholder="Share your thoughts..." />
+        <button type="submit" :disabled="!commentContent.trim()">Send</button>
       </form>
 
       <div class="comments">
@@ -21,7 +21,7 @@
             <p>{{ comment.content }}</p>
             <div class="comment-actions">
               <button type="button">👍 {{ comment.likes }}</button>
-              <button type="button">回复</button>
+              <button type="button">Reply</button>
             </div>
             <div class="reply" v-for="reply in comment.replies" :key="reply.id">
               <img :src="reply.author.avatar" :alt="reply.author.name" />
@@ -38,7 +38,7 @@
       </div>
     </div>
   </section>
-  <p v-else>正在加载动态...</p>
+  <p v-else>Loading post...</p>
 </template>
 
 <script setup>
@@ -68,10 +68,10 @@ const formatRelative = (value) => {
   const date = new Date(value);
   const diff = Date.now() - date.getTime();
   const hours = Math.round(diff / (1000 * 60 * 60));
-  if (hours < 1) return '刚刚';
-  if (hours < 24) return `${hours} 小时前`;
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours} hours ago`;
   const days = Math.round(hours / 24);
-  return `${days} 天前`;
+  return `${days} days ago`;
 };
 </script>
 

@@ -31,8 +31,8 @@
         </div>
       </div>
       <div class="summary-actions">
-        <button type="button">联系社团</button>
-        <RouterLink :to="{ name: 'events' }">查看活动</RouterLink>
+        <button type="button">Contact club</button>
+        <RouterLink :to="{ name: 'events' }">View events</RouterLink>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
       <article class="info-block">
         <header>
           <h2>Posts</h2>
-          <span>社团动态</span>
+          <span>Club updates</span>
         </header>
         <ul>
           <li v-for="post in club.posts" :key="post.id">
@@ -56,7 +56,7 @@
       <article class="info-block">
         <header>
           <h2>Events</h2>
-          <span>近期安排</span>
+          <span>Upcoming schedule</span>
         </header>
         <ul>
           <li v-for="event in club.events" :key="event.id">
@@ -72,7 +72,7 @@
       <article class="info-block">
         <header>
           <h2>Members</h2>
-          <span>核心团队</span>
+          <span>Core team</span>
         </header>
         <ul>
           <li v-for="member in club.members" :key="member.id">
@@ -93,15 +93,15 @@
       <p>{{ newestEvent.detail }}</p>
       <div class="newest-event__meta">
         <span>{{ formatDate(newestEvent.date) }}</span>
-        <RouterLink :to="{ name: 'events' }">前往报名</RouterLink>
+        <RouterLink :to="{ name: 'events' }">Go to registration</RouterLink>
       </div>
     </section>
   </section>
 
   <section v-else class="empty-state">
-    <h2>未找到该社团</h2>
-    <p>请返回社团列表重新选择。</p>
-    <RouterLink to="/clubs">返回社团</RouterLink>
+    <h2>Club not found</h2>
+    <p>Please head back to the club list and pick another one.</p>
+    <RouterLink to="/clubs">Back to clubs</RouterLink>
   </section>
 </template>
 
@@ -127,15 +127,15 @@ const newestEvent = computed(() => {
   return (
     club.value.newestEvent ||
     club.value.events?.[0] || {
-      title: '活动筹备中',
-      detail: '敬请期待社团发布下一场活动。',
+      title: 'Event in planning',
+      detail: 'Stay tuned for the club\'s next announcement.',
       date: null
     }
   );
 });
 
 const formatDate = (isoString) => {
-  if (!isoString) return '待定';
+  if (!isoString) return 'TBD';
   try {
     const formatter = new Intl.DateTimeFormat('en-US', {
       month: 'short',

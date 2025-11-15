@@ -7,10 +7,10 @@ y<template>
           <input
               v-model="searchTerm"
               type="search"
-              placeholder="Search events around campus"
+              placeholder="Search building around campus"
               @keyup.enter="handleSearch"
           />
-          <button type="button" @click="handleSearch">搜索</button>
+          <button type="button" @click="handleSearch">Search</button>
         </div>
         <div class="chip-row">
           <button
@@ -22,11 +22,11 @@ y<template>
           >
             {{ filter.label }}
           </button>
-          <button type="button" class="chip outline" @click="locateUser">实时定位</button>
+          <button type="button" class="chip outline" @click="locateUser">Locate me</button>
         </div>
       </div>
       <p class="hero-hint">
-        数据由后台提供：建筑聚合、活动清单、社团信息以及地理坐标映射。当前示例为静态预览。
+        Data flows from the backend: building clusters, event rosters, club info, and geo mapping. This screen shows a static preview for now.
       </p>
     </header>
 
@@ -35,9 +35,9 @@ y<template>
       <aside class="side-panel">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">建筑热点</p>
-            <h2>校园活动气泡</h2>
-            <span>{{ filteredBuildings.length }} 个分布</span>
+            <p class="eyebrow">Building highlights</p>
+            <h2>Campus event bubbles</h2>
+            <span>{{ filteredBuildings.length }} clusters</span>
           </div>
         </div>
         <div class="building-list">
@@ -51,7 +51,7 @@ y<template>
               <div class="badge">{{ building.events.length }}</div>
               <div class="building-meta">
                 <strong>{{ building.name }}</strong>
-                <span>{{ building.events.length }} 场活动 · {{ tagLabel(building.tag) }}</span>
+                <span>{{ building.events.length }} events · {{ tagLabel(building.tag) }}</span>
               </div>
             </li>
           </ul>
@@ -64,7 +64,7 @@ y<template>
               <span v-if="selectedBuilding">{{ selectedBuilding.name }}</span>
               <span v-else>Campus</span>
             </p>
-            <button type="button" @click="openBuildingEvents">查看全部</button>
+            <button type="button" @click="openBuildingEvents">View all</button>
           </header>
           <div class="event-cards">
             <article
@@ -142,7 +142,7 @@ const placeholderSlots = computed(() =>
 );
 
 const tagLabel = (tagId) => {
-  return filters.find((filter) => filter.id === tagId)?.label || '活动';
+  return filters.find((filter) => filter.id === tagId)?.label || 'Events';
 };
 
 const handleSearch = () => {

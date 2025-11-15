@@ -2,52 +2,52 @@
   <div class="home">
     <section class="hero-card">
       <div class="hero-text">
-        <p class="eyebrow">UTM 校园活动指南</p>
+        <p class="eyebrow">UTM campus activity guide</p>
         <h1>
-          发现、参与、创造
+          Discover. Join. Create.
           <span>What2Do</span>
         </h1>
-        <p class="lede">沉浸式掌握校园热点，快速报名高质量活动，让灵感随时发生。</p>
+        <p class="lede">Stay immersed in campus highlights, grab seats at high-quality events, and spark ideas anytime.</p>
 
         <form class="search" @submit.prevent="handleSearch">
-          <label for="search-input" class="sr-only">活动搜索</label>
+          <label for="search-input" class="sr-only">Search events</label>
           <input
             id="search-input"
             v-model="query"
             type="search"
-            placeholder="你想做什么？ 例如：音乐会、社团、公开课"
+            placeholder="What do you want to do? e.g., concerts, clubs, open lectures"
           />
-          <button type="submit">搜索</button>
+          <button type="submit">Search</button>
         </form>
 
         <div class="quick-tags">
-          <span>熱門标签：</span>
+          <span>Popular tags:</span>
           <button v-for="tag in quickFilters" :key="tag" type="button" @click="handleQuickTag(tag)">
             {{ tag }}
           </button>
         </div>
 
         <div class="hero-actions">
-          <RouterLink to="/events" class="primary">浏览活动</RouterLink>
-          <RouterLink to="/events/new" class="secondary">发布活动</RouterLink>
+          <RouterLink to="/events" class="primary">Browse events</RouterLink>
+          <RouterLink to="/events/new" class="secondary">Create event</RouterLink>
         </div>
       </div>
 
       <div class="hero-visual">
         <div class="hero-panel">
-          <p>本周推荐</p>
+          <p>This week's picks</p>
           <div class="hero-stats">
             <button type="button" class="stat-block" @click="goToHotTag">
               <strong>{{ featuredHotEvents.length }}</strong>
-              <span>精选活动</span>
+              <span>Featured events</span>
             </button>
             <button type="button" class="stat-block" @click="goToHotClubs">
               <strong>{{ hotClubs.length }}</strong>
-              <span>特色社团</span>
+              <span>Spotlight clubs</span>
             </button>
             <button type="button" class="stat-block" @click="goToOfficialEvents">
               <strong>{{ officialEvents.length }}</strong>
-              <span>学校辅导</span>
+              <span>Student support</span>
             </button>
           </div>
           <ul>
@@ -71,31 +71,31 @@
       <header class="panel__header">
         <div>
           <p class="eyebrow eyebrow--soft">Events</p>
-          <h2>即将开始的活动</h2>
+          <h2>Starting soon</h2>
         </div>
-        <RouterLink to="/events">查看全部</RouterLink>
+        <RouterLink to="/events">See all</RouterLink>
       </header>
 
       <div class="event-grid">
         <article v-for="event in upcomingEvents" :key="event.id" class="event-card">
-          <div class="event-card__badge">{{ event.tags?.[0] || '活动' }}</div>
+          <div class="event-card__badge">{{ event.tags?.[0] || 'Event' }}</div>
           <h3>{{ event.title }}</h3>
           <p>{{ event.description }}</p>
           <dl>
             <div>
-              <dt>时间</dt>
+              <dt>Time</dt>
               <dd>{{ formatDate(event.date) }}</dd>
             </div>
             <div>
-              <dt>地点</dt>
+              <dt>Location</dt>
               <dd>{{ event.location }}</dd>
             </div>
             <div>
-              <dt>社团</dt>
+              <dt>Club</dt>
               <dd>{{ event.club }}</dd>
             </div>
           </dl>
-          <RouterLink :to="`/events/${event.id}`">查看详情</RouterLink>
+          <RouterLink :to="`/events/${event.id}`">View details</RouterLink>
         </article>
       </div>
     </section>
@@ -104,9 +104,9 @@
       <header class="panel__header">
         <div>
           <p class="eyebrow eyebrow--soft">Clubs</p>
-          <h2>按兴趣探索社团</h2>
+          <h2>Explore clubs by interest</h2>
         </div>
-        <RouterLink to="/clubs">更多社团</RouterLink>
+        <RouterLink to="/clubs">More clubs</RouterLink>
       </header>
 
       <div class="club-grid">
@@ -118,7 +118,7 @@
             <h3>{{ club.label }}</h3>
             <p>{{ club.description }}</p>
           </div>
-          <button type="button">关注</button>
+          <button type="button">Follow</button>
         </article>
       </div>
     </section>
@@ -144,13 +144,13 @@ import { clubs } from '@/data/clubs';
 import { HOT_CLUB_THRESHOLD, HOT_EVENT_TAG, HOT_EVENT_THRESHOLD, OFFICIAL_TAG } from '@/constants/highlights';
 
 const router = useRouter();
-const quickFilters = ['学术', '科技', '音乐', '社交', HOT_EVENT_TAG, OFFICIAL_TAG];
+const quickFilters = ['Academic', 'Tech', 'Music', 'Social', HOT_EVENT_TAG, OFFICIAL_TAG];
 
 const clubCategories = [
-  { label: '学术 Academic', description: '讲座、读书会、研究讨论', icon: '📘', accent: 'rgba(14, 165, 233, 0.15)' },
-  { label: '艺术 Arts', description: '音乐、戏剧、视觉艺术', icon: '🎭', accent: 'rgba(244, 114, 182, 0.15)' },
-  { label: '运动 Sports', description: '团队赛事、健身训练', icon: '⚽️', accent: 'rgba(74, 222, 128, 0.15)' },
-  { label: '文化 Culture', description: '语言交换、多元文化体验', icon: '🌏', accent: 'rgba(251, 191, 36, 0.2)' }
+  { label: 'Academic', description: 'Lectures, reading circles, research discussions', icon: '📘', accent: 'rgba(14, 165, 233, 0.15)' },
+  { label: 'Arts', description: 'Music, theatre, visual arts', icon: '🎭', accent: 'rgba(244, 114, 182, 0.15)' },
+  { label: 'Sports', description: 'Team matches and training sessions', icon: '⚽️', accent: 'rgba(74, 222, 128, 0.15)' },
+  { label: 'Culture', description: 'Language exchanges and multicultural experiences', icon: '🌏', accent: 'rgba(251, 191, 36, 0.2)' }
 ];
 
 const eventStore = useEventStore();
@@ -201,25 +201,25 @@ const upcomingEvents = computed(() => events.value.slice(0, 6));
 const insightCards = computed(() => [
   {
     title: 'Hot Today',
-    value: `${featuredHotEvents.value.length} 场火热`,
-    caption: `最高报名 ${hotEvents.value[0]?.signupCount || 0} 人`
+    value: `${featuredHotEvents.value.length} events heating up`,
+    caption: `Top RSVP count: ${hotEvents.value[0]?.signupCount || 0}`
   },
   {
-    title: '特色社团',
-    value: `${hotClubs.value.length} 个推荐`,
-    caption: `成员数 ≥ ${HOT_CLUB_THRESHOLD}`
+    title: 'Spotlight Clubs',
+    value: `${hotClubs.value.length} featured`,
+    caption: `Members ≥ ${HOT_CLUB_THRESHOLD}`
   },
   {
-    title: '学校辅导',
-    value: `${officialEvents.value.length} 场官方活动`,
-    caption: '来自学校官方认证'
+    title: 'Student Support',
+    value: `${officialEvents.value.length} official events`,
+    caption: 'From school-certified hosts'
   }
 ]);
 
 const formatDate = (isoString) => {
-  if (!isoString) return '待定';
+  if (!isoString) return 'TBD';
   try {
-    const formatter = new Intl.DateTimeFormat('zh-CN', {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
       month: 'short',
       day: 'numeric'
     });
@@ -262,7 +262,7 @@ const goToHotTag = () => {
 };
 
 const goToHotClubs = () => {
-  router.push({ name: 'clubs', query: { filter: '热门社团' } });
+  router.push({ name: 'clubs', query: { filter: 'hot-clubs' } });
 };
 
 const goToOfficialEvents = () => {
