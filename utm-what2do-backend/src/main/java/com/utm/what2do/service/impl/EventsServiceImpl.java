@@ -52,7 +52,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
     @Transactional(rollbackFor = Exception.class)
     public EventDetailVO createEvent(EventCreateDTO dto, Long userId) {
         // 1. 验证建筑是否存在
-        Buildings building = buildingsService.getById(dto.getBuildingId().toString());
+        Buildings building = buildingsService.getById(Long.parseLong(dto.getBuildingId()));
         if (building == null) {
             throw new BusinessException(StatusCode.BUILDING_NOT_FOUND);
         }
@@ -74,7 +74,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
         event.setStart_time(Date.from(dto.getStartTime().atZone(ZoneId.systemDefault()).toInstant()));
         event.setEnd_time(Date.from(dto.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
 
-        event.setBuilding_id(dto.getBuildingId().toString());
+        event.setBuilding_id(dto.getBuildingId());
         event.setRoom(dto.getRoom());
         event.setClub_id(dto.getOrganizerId());
         event.setCover_url(dto.getCoverImageUrl());
@@ -254,7 +254,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
         event.setDescription_long(dto.getDescription());
         event.setStart_time(Date.from(dto.getStartTime().atZone(ZoneId.systemDefault()).toInstant()));
         event.setEnd_time(Date.from(dto.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
-        event.setBuilding_id(dto.getBuildingId().toString());
+        event.setBuilding_id(dto.getBuildingId());
         event.setRoom(dto.getRoom());
         event.setCover_url(dto.getCoverImageUrl());
         event.setUpdated_at(new Date());
@@ -361,7 +361,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
 
         // 获取建筑信息
         try {
-            Buildings building = buildingsService.getById(event.getBuilding_id());
+            Buildings building = buildingsService.getById(Long.parseLong(event.getBuilding_id()));
             if (building != null) {
                 vo.setBuildingName(building.getName());
             }
@@ -406,16 +406,11 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
 
         // 建筑信息
         try {
-            Buildings building = buildingsService.getById(event.getBuilding_id());
+            Buildings building = buildingsService.getById(Long.parseLong(event.getBuilding_id()));
             if (building != null) {
-                // Convert String ID to Long for VO
-                try {
-                    vo.setBuildingId(Long.parseLong(building.getId()));
-                } catch (NumberFormatException e) {
-                    log.warn("无法将建筑ID转换为Long: {}", building.getId());
-                }
+                vo.setBuildingId(building.getId());
                 vo.setBuildingName(building.getName());
-                vo.setBuildingAddress(building.getCampus_zone());
+                vo.setBuildingAddress(building.getAddress());
             }
         } catch (Exception e) {
             log.warn("获取建筑信息失败: buildingId={}", event.getBuilding_id(), e);
@@ -429,7 +424,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
             vo.setOrganizerType("CLUB");
             vo.setOrganizerName(club.getName());
             vo.setOrganizerLogo(club.getLogo_url());
-            vo.setOrganizerBio(club.getDescription());
+            vo.setOrganizerBio(club.getBio());
         }
 
         vo.setRegistrationUrl(event.getRegistration_notes());
