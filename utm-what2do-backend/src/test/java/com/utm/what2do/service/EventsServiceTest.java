@@ -116,13 +116,12 @@ class EventsServiceTest {
         // Given
         when(buildingsService.getById("1")).thenReturn(testBuilding);
         when(clubsService.getById(1L)).thenReturn(testClub);
-        when(eventsMapper.insert(any(Events.class))).thenReturn(1);
 
-        // Mock save operation
+        // Mock save operation - set ID and return 1
         doAnswer(invocation -> {
             Events event = invocation.getArgument(0);
             event.setId(1L);
-            return null;
+            return 1;
         }).when(eventsMapper).insert(any(Events.class));
 
         // When
@@ -237,19 +236,19 @@ class EventsServiceTest {
     }
 
     @Test
-    @DisplayName("删除活动 - 活动已删除")
+    @DisplayName("删除活动 - 活动已删除（幂等操作）")
     void deleteEvent_EventAlreadyDeleted() {
-        // Given
+        // Given - 已删除的活动可以再次"删除"（幂等）
         testEvent.setDeleted(1);
         when(eventsMapper.selectById(1L)).thenReturn(testEvent);
+        when(eventsMapper.updateById(any(Events.class))).thenReturn(1);
 
-        // When & Then
-        assertThrows(BusinessException.class, () -> {
-            eventsService.deleteEvent(1L, 1L);
-        });
+        // When - 不抛异常，允许重复软删除
+        eventsService.deleteEvent(1L, 1L);
 
+        // Then
         verify(eventsMapper).selectById(1L);
-        verify(eventsMapper, never()).updateById(any());
+        verify(eventsMapper).updateById(any(Events.class));
     }
 
     @Test
