@@ -124,6 +124,9 @@ class EventsServiceTest {
             return 1;
         }).when(eventsMapper).insert(any(Events.class));
 
+        // Mock getEventDetail lookup after save
+        when(eventsMapper.selectById(1L)).thenReturn(testEvent);
+
         // When
         EventDetailVO result = eventsService.createEvent(eventCreateDTO, 1L);
 
