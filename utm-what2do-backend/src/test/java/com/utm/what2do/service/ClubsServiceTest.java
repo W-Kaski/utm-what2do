@@ -14,9 +14,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +44,6 @@ class ClubsServiceTest {
     @Mock
     private BuildingsService buildingsService;
 
-    @Spy
     private ClubsServiceImpl clubsService;
 
     private Clubs testClub;
@@ -51,10 +51,9 @@ class ClubsServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 注入Mock到Service
+        // 手动创建Service实例并注入Mock
+        clubsService = new ClubsServiceImpl(eventsMapper, buildingsService);
         ReflectionTestUtils.setField(clubsService, "baseMapper", clubsMapper);
-        ReflectionTestUtils.setField(clubsService, "eventsMapper", eventsMapper);
-        ReflectionTestUtils.setField(clubsService, "buildingsService", buildingsService);
 
         // 准备测试社团
         testClub = new Clubs();
