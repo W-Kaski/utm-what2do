@@ -116,7 +116,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     public PostVO getPostDetail(Long postId) {
         Posts post = this.getById(postId);
         if (post == null || post.getDeleted() == 1) {
-            throw new BusinessException(StatusCode.POST_NOT_FOUND.getCode(), "帖子不存在");
+            throw new BusinessException(StatusCode.PARAMS_ERROR.getCode(), "帖子不存在");
         }
 
         log.info("查询帖子详情: postId={}", postId);
@@ -128,7 +128,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     public void deletePost(Long postId, Long userId) {
         Posts post = this.getById(postId);
         if (post == null || post.getDeleted() == 1) {
-            throw new BusinessException(StatusCode.POST_NOT_FOUND.getCode(), "帖子不存在");
+            throw new BusinessException(StatusCode.PARAMS_ERROR.getCode(), "帖子不存在");
         }
 
         // 权限检查：只有作者可以删除
@@ -150,7 +150,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     public void likePost(Long postId) {
         Posts post = this.getById(postId);
         if (post == null || post.getDeleted() == 1) {
-            throw new BusinessException(StatusCode.POST_NOT_FOUND.getCode(), "帖子不存在");
+            throw new BusinessException(StatusCode.PARAMS_ERROR.getCode(), "帖子不存在");
         }
 
         post.setLikes_count(post.getLikes_count() + 1);
@@ -165,7 +165,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     public void pinPost(Long postId, Long userId, Boolean pinned) {
         Posts post = this.getById(postId);
         if (post == null || post.getDeleted() == 1) {
-            throw new BusinessException(StatusCode.POST_NOT_FOUND.getCode(), "帖子不存在");
+            throw new BusinessException(StatusCode.PARAMS_ERROR.getCode(), "帖子不存在");
         }
 
         // 权限检查：只有作者或管理员可以置顶
