@@ -1,12 +1,12 @@
 package com.utm.what2do.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.utm.what2do.model.entity.Favorites;
+import com.utm.what2do.model.entity.EventFavorites;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 收藏Mapper
+ * 活动收藏Mapper
  */
 @Mapper
-public interface FavoritesMapper extends BaseMapper<Favorites> {
+public interface EventFavoritesMapper extends BaseMapper<EventFavorites> {
 }
