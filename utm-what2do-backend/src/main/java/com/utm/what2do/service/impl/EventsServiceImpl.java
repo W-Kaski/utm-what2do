@@ -52,7 +52,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
     @Transactional(rollbackFor = Exception.class)
     public EventDetailVO createEvent(EventCreateDTO dto, Long userId) {
         // 1. 验证建筑是否存在
-        Buildings building = buildingsService.getById(Long.parseLong(dto.getBuildingId()));
+        Buildings building = buildingsService.getById(dto.getBuildingId().toString());
         if (building == null) {
             throw new BusinessException(StatusCode.BUILDING_NOT_FOUND);
         }
@@ -74,7 +74,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
         event.setStart_time(Date.from(dto.getStartTime().atZone(ZoneId.systemDefault()).toInstant()));
         event.setEnd_time(Date.from(dto.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
 
-        event.setBuilding_id(dto.getBuildingId());
+        event.setBuilding_id(dto.getBuildingId().toString());
         event.setRoom(dto.getRoom());
         event.setClub_id(dto.getOrganizerId());
         event.setCover_url(dto.getCoverImageUrl());
@@ -254,7 +254,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
         event.setDescription_long(dto.getDescription());
         event.setStart_time(Date.from(dto.getStartTime().atZone(ZoneId.systemDefault()).toInstant()));
         event.setEnd_time(Date.from(dto.getEndTime().atZone(ZoneId.systemDefault()).toInstant()));
-        event.setBuilding_id(dto.getBuildingId());
+        event.setBuilding_id(dto.getBuildingId().toString());
         event.setRoom(dto.getRoom());
         event.setCover_url(dto.getCoverImageUrl());
         event.setUpdated_at(new Date());
@@ -361,7 +361,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
 
         // 获取建筑信息
         try {
-            Buildings building = buildingsService.getById(Long.parseLong(event.getBuilding_id()));
+            Buildings building = buildingsService.getById(event.getBuilding_id());
             if (building != null) {
                 vo.setBuildingName(building.getName());
             }
