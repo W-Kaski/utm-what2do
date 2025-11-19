@@ -3,40 +3,45 @@ package com.utm.what2do.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.utm.what2do.model.entity.Follows;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.utm.what2do.model.vo.ClubDetailVO;
+import com.utm.what2do.model.vo.UserInfoVO;
 
 /**
- * 关注Service（关注社团）
+ * 关注Service
  */
 public interface FollowsService extends IService<Follows> {
 
     /**
-     * 关注社团
+     * 关注用户
      */
-    void followClub(Long userId, Long clubId);
+    void followUser(Long followerId, Long targetUserId);
 
     /**
-     * 取消关注社团
+     * 取消关注用户
      */
-    void unfollowClub(Long userId, Long clubId);
+    void unfollowUser(Long followerId, Long targetUserId);
 
     /**
-     * 检查是否已关注社团
+     * 检查是否已关注
      */
-    boolean isFollowingClub(Long userId, Long clubId);
+    boolean isFollowing(Long followerId, Long targetUserId);
 
     /**
-     * 获取用户关注的社团列表
+     * 获取关注列表（我关注的人）
      */
-    Page<ClubDetailVO> getFollowingClubs(Long userId, Long current, Long size);
+    Page<UserInfoVO> getFollowingList(Long userId, Long current, Long size);
 
     /**
-     * 获取用户关注的社团数
+     * 获取粉丝列表（关注我的人）
+     */
+    Page<UserInfoVO> getFollowerList(Long userId, Long current, Long size);
+
+    /**
+     * 获取关注数
      */
     Long getFollowingCount(Long userId);
 
     /**
-     * 获取社团的粉丝数
+     * 获取粉丝数
      */
-    Long getClubFollowerCount(Long clubId);
+    Long getFollowerCount(Long userId);
 }
