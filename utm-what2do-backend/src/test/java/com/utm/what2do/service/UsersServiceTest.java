@@ -1,5 +1,6 @@
 package com.utm.what2do.service;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.utm.what2do.common.exception.BusinessException;
@@ -83,7 +84,9 @@ class UsersServiceTest {
                 user.setId(1L);
                 return 1;
             });
+            SaSession mockSession = mock(SaSession.class);
             stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
+            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
             stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
 
             // When
@@ -131,7 +134,9 @@ class UsersServiceTest {
                 user.setId(1L);
                 return 1;
             });
+            SaSession mockSession = mock(SaSession.class);
             stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
+            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
             stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
 
             // When
@@ -153,7 +158,9 @@ class UsersServiceTest {
         try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
             // Given - selectOne takes two arguments (wrapper, boolean)
             when(usersMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(testUser);
+            SaSession mockSession = mock(SaSession.class);
             stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
+            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
             stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
 
             // When
