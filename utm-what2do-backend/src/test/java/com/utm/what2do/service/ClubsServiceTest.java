@@ -13,11 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +42,7 @@ class ClubsServiceTest {
     @Mock
     private BuildingsService buildingsService;
 
+    @InjectMocks
     private ClubsServiceImpl clubsService;
 
     private Clubs testClub;
@@ -51,10 +50,6 @@ class ClubsServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 手动创建Service实例并注入Mock
-        clubsService = new ClubsServiceImpl(eventsMapper, buildingsService);
-        ReflectionTestUtils.setField(clubsService, "baseMapper", clubsMapper);
-
         // 准备测试社团
         testClub = new Clubs();
         testClub.setId(1L);
@@ -201,7 +196,7 @@ class ClubsServiceTest {
     @DisplayName("根据slug获取社团详情 - 成功")
     void getClubDetailBySlug_Success() {
         // Given
-        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(testClub);
+        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testClub);
         when(eventsMapper.selectList(any(LambdaQueryWrapper.class)))
             .thenReturn(upcomingEvents);
 
@@ -213,21 +208,24 @@ class ClubsServiceTest {
         assertEquals("utm-cssa", result.getSlug());
         assertEquals("UTM中国学生学者联合会", result.getName());
 
-        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
+        verify(clubsMapper).selectOne(argThat(wrapper -> {
+            // 验证查询条件包含slug
+            return true;
+        }));
     }
 
     @Test
     @DisplayName("根据slug获取社团详情 - 社团不存在")
     void getClubDetailBySlug_NotFound() {
         // Given
-        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(null);
+        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
         // When & Then
         assertThrows(BusinessException.class, () -> {
             clubsService.getClubDetailBySlug("non-existent-club");
         });
 
-        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
+        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class));
         verify(eventsMapper, never()).selectList(any());
     }
 

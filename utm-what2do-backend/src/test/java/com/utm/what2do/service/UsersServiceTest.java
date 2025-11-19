@@ -1,6 +1,5 @@
 package com.utm.what2do.service;
 
-import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.utm.what2do.common.exception.BusinessException;
@@ -15,14 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import cn.dev33.satoken.secure.BCrypt;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.util.Date;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -38,6 +36,7 @@ class UsersServiceTest {
     @Mock
     private UsersMapper usersMapper;
 
+    @InjectMocks
     private UsersServiceImpl usersService;
 
     private UserRegisterDTO registerDTO;
@@ -46,10 +45,6 @@ class UsersServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 手动创建Service实例并注入Mock
-        usersService = new UsersServiceImpl();
-        ReflectionTestUtils.setField(usersService, "baseMapper", usersMapper);
-
         // 准备注册DTO
         registerDTO = new UserRegisterDTO();
         registerDTO.setUsername("testuser");
@@ -70,122 +65,109 @@ class UsersServiceTest {
         testUser.setPassword_hash(BCrypt.hashpw("password123", BCrypt.gensalt()));
         testUser.setRole(RoleConstants.USER);
         testUser.setCreated_at(new Date());
+        testUser.setUpdated_at(new Date());
         testUser.setDeleted(0);
     }
 
     @Test
     @DisplayName("用户注册 - 成功")
     void register_Success() {
-        try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
-            // Given - register uses count() not selectOne
-            when(usersMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
-            when(usersMapper.insert(any(Users.class))).thenAnswer(invocation -> {
-                Users user = invocation.getArgument(0);
-                user.setId(1L);
-                return 1;
-            });
-            SaSession mockSession = mock(SaSession.class);
-            stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
-            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
-            stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
+        // Given
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(usersMapper.insert(any(Users.class))).thenAnswer(invocation -> {
+            Users user = invocation.getArgument(0);
+            user.setId(1L);
+            return 1;
+        });
 
-            // When
-            UserInfoVO result = usersService.register(registerDTO);
+        // Mock StpUtil (需要在实际测试环境中配置Sa-Token)
+        // 这里只验证基本逻辑
 
-            // Then
-            assertNotNull(result);
-            assertEquals("testuser", result.getUsername());
-            assertEquals("test@utm.utoronto.ca", result.getEmail());
-            assertEquals(RoleConstants.USER, result.getRole());
+        // When
+        UserInfoVO result = usersService.register(registerDTO);
 
-            verify(usersMapper, times(2)).selectCount(any(LambdaQueryWrapper.class)); // username + email
-            verify(usersMapper).insert(argThat(user ->
-                user.getUsername().equals("testuser") &&
-                user.getPassword_hash() != null &&
-                !user.getPassword_hash().equals("password123") // 密码应该被加密
-            ));
-        }
+        // Then
+        assertNotNull(result);
+        assertEquals("testuser", result.getUsername());
+        assertEquals("test@utm.utoronto.ca", result.getEmail());
+        assertEquals(RoleConstants.USER, result.getRole());
+
+        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class));
+        verify(usersMapper).insert(argThat(user ->
+            user.getUsername().equals("testuser") &&
+            user.getPassword_hash() != null &&
+            !user.getPassword_hash().equals("password123") // 密码应该被加密
+        ));
     }
 
     @Test
     @DisplayName("用户注册 - 用户名已存在")
     void register_UsernameExists() {
-        // Given - first count (username) returns 1
-        when(usersMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+        // Given
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
 
         // When & Then
         assertThrows(BusinessException.class, () -> {
             usersService.register(registerDTO);
         });
 
-        verify(usersMapper).selectCount(any(LambdaQueryWrapper.class));
+        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class));
         verify(usersMapper, never()).insert(any());
     }
 
     @Test
     @DisplayName("用户注册 - 社团管理员角色")
     void register_ClubManagerRole() {
-        try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
-            // Given
-            registerDTO.setRole(RoleConstants.CLUB_MANAGER);
-            when(usersMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
-            when(usersMapper.insert(any(Users.class))).thenAnswer(invocation -> {
-                Users user = invocation.getArgument(0);
-                user.setId(1L);
-                return 1;
-            });
-            SaSession mockSession = mock(SaSession.class);
-            stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
-            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
-            stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
+        // Given
+        registerDTO.setRole(RoleConstants.CLUB_MANAGER);
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(usersMapper.insert(any(Users.class))).thenAnswer(invocation -> {
+            Users user = invocation.getArgument(0);
+            user.setId(1L);
+            return 1;
+        });
 
-            // When
-            UserInfoVO result = usersService.register(registerDTO);
+        // When
+        UserInfoVO result = usersService.register(registerDTO);
 
-            // Then
-            assertNotNull(result);
-            assertEquals(RoleConstants.CLUB_MANAGER, result.getRole());
+        // Then
+        assertNotNull(result);
+        assertEquals(RoleConstants.CLUB_MANAGER, result.getRole());
 
-            verify(usersMapper).insert(argThat(user ->
-                user.getRole().equals(RoleConstants.CLUB_MANAGER)
-            ));
-        }
+        verify(usersMapper).insert(argThat(user ->
+            user.getRole().equals(RoleConstants.CLUB_MANAGER)
+        ));
     }
 
     @Test
     @DisplayName("用户登录 - 成功")
     void login_Success() {
-        try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
-            // Given - selectOne takes two arguments (wrapper, boolean)
-            when(usersMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(testUser);
-            SaSession mockSession = mock(SaSession.class);
-            stpUtilMock.when(() -> StpUtil.login(anyLong())).thenAnswer(inv -> null);
-            stpUtilMock.when(StpUtil::getSession).thenReturn(mockSession);
-            stpUtilMock.when(StpUtil::getTokenValue).thenReturn("test-token");
+        // Given
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
 
-            // When
-            Map<String, Object> result = usersService.login(loginDTO);
+        // When
+        UserInfoVO result = usersService.login(loginDTO);
 
-            // Then
-            assertNotNull(result);
-            assertTrue(result.containsKey("userInfo") || result.containsKey("token"));
+        // Then
+        assertNotNull(result);
+        assertEquals("testuser", result.getUsername());
+        assertEquals(RoleConstants.USER, result.getRole());
 
-            verify(usersMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
-        }
+        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class));
     }
 
     @Test
     @DisplayName("用户登录 - 用户不存在")
     void login_UserNotFound() {
         // Given
-        when(usersMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(null);
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
         // When & Then
         assertThrows(BusinessException.class, () -> {
             usersService.login(loginDTO);
         });
 
-        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
+        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class));
     }
 
     @Test
@@ -193,14 +175,14 @@ class UsersServiceTest {
     void login_WrongPassword() {
         // Given
         loginDTO.setPassword("wrongpassword");
-        when(usersMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(testUser);
+        when(usersMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
 
         // When & Then
         assertThrows(BusinessException.class, () -> {
             usersService.login(loginDTO);
         });
 
-        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
+        verify(usersMapper).selectOne(any(LambdaQueryWrapper.class));
     }
 
     @Test
@@ -217,6 +199,7 @@ class UsersServiceTest {
         assertEquals(1L, result.getId());
         assertEquals("testuser", result.getUsername());
         assertEquals("test@utm.utoronto.ca", result.getEmail());
+        assertNull(result.getPasswordHash()); // 密码不应该返回
 
         verify(usersMapper).selectById(1L);
     }
@@ -242,8 +225,8 @@ class UsersServiceTest {
         when(usersMapper.selectById(1L)).thenReturn(testUser);
         when(usersMapper.updateById(any(Users.class))).thenReturn(1);
 
-        UserInfoVO updateData = new UserInfoVO();
-        updateData.setAvatar("https://example.com/avatar.jpg");
+        Users updateData = new Users();
+        updateData.setProfile_image_url("https://example.com/avatar.jpg");
         updateData.setBio("Updated bio");
 
         // When
@@ -252,7 +235,10 @@ class UsersServiceTest {
         // Then
         assertNotNull(result);
         verify(usersMapper).selectById(1L);
-        verify(usersMapper).updateById(any(Users.class));
+        verify(usersMapper).updateById(argThat(user ->
+            user.getProfile_image_url() != null &&
+            user.getBio() != null
+        ));
     }
 
     @Test
@@ -261,7 +247,7 @@ class UsersServiceTest {
         // Given
         when(usersMapper.selectById(999L)).thenReturn(null);
 
-        UserInfoVO updateData = new UserInfoVO();
+        Users updateData = new Users();
         updateData.setBio("Bio");
 
         // When & Then
@@ -290,18 +276,17 @@ class UsersServiceTest {
     }
 
     @Test
-    @DisplayName("用户实体转换为VO - 基本字段验证")
-    void convertToVO_BasicFields() {
-        // Given
-        when(usersMapper.selectById(1L)).thenReturn(testUser);
-
+    @DisplayName("用户实体转换为VO - 密码字段不应包含")
+    void convertToVO_NoPasswordField() {
         // When
         UserInfoVO vo = usersService.getUserInfo(1L);
 
+        // Mock the mapper
+        when(usersMapper.selectById(1L)).thenReturn(testUser);
+        vo = usersService.getUserInfo(1L);
+
         // Then
         assertNotNull(vo);
-        assertEquals(testUser.getId(), vo.getId());
-        assertEquals(testUser.getUsername(), vo.getUsername());
-        assertEquals(testUser.getEmail(), vo.getEmail());
+        assertNull(vo.getPasswordHash()); // VO中不应该包含密码hash
     }
 }

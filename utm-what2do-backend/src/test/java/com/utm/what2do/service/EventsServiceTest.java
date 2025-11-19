@@ -16,11 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -51,6 +51,7 @@ class EventsServiceTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+    @InjectMocks
     private EventsServiceImpl eventsService;
 
     private EventCreateDTO eventCreateDTO;
@@ -60,13 +61,6 @@ class EventsServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 手动创建Service实例并注入Mock
-        eventsService = new EventsServiceImpl(redisTemplate, buildingsService, clubsService);
-        ReflectionTestUtils.setField(eventsService, "baseMapper", eventsMapper);
-
-        // Mock Redis operations (lenient for tests that don't use it)
-        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-
         // 准备测试数据
         eventCreateDTO = new EventCreateDTO();
         eventCreateDTO.setTitle("测试活动");
@@ -108,6 +102,9 @@ class EventsServiceTest {
         testEvent.setDeleted(0);
         testEvent.setCreated_at(new Date());
         testEvent.setUpdated_at(new Date());
+
+        // Mock Redis operations
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
     @Test
@@ -116,16 +113,14 @@ class EventsServiceTest {
         // Given
         when(buildingsService.getById("1")).thenReturn(testBuilding);
         when(clubsService.getById(1L)).thenReturn(testClub);
+        when(eventsMapper.insert(any(Events.class))).thenReturn(1);
 
-        // Mock save operation - set ID and return 1
+        // Mock save operation
         doAnswer(invocation -> {
             Events event = invocation.getArgument(0);
             event.setId(1L);
-            return 1;
+            return null;
         }).when(eventsMapper).insert(any(Events.class));
-
-        // Mock getEventDetail lookup after save
-        when(eventsMapper.selectById(1L)).thenReturn(testEvent);
 
         // When
         EventDetailVO result = eventsService.createEvent(eventCreateDTO, 1L);
@@ -136,8 +131,8 @@ class EventsServiceTest {
         assertEquals("test-event", result.getSlug());
         assertEquals("DH2010", result.getRoom());
 
-        verify(buildingsService, times(2)).getById("1"); // validation + convertToDetailVO
-        verify(clubsService, times(2)).getById(1L); // validation + convertToDetailVO
+        verify(buildingsService).getById("1");
+        verify(clubsService).getById(1L);
         verify(eventsMapper).insert(any(Events.class));
     }
 
@@ -239,19 +234,19 @@ class EventsServiceTest {
     }
 
     @Test
-    @DisplayName("删除活动 - 活动已删除（幂等操作）")
+    @DisplayName("删除活动 - 活动已删除")
     void deleteEvent_EventAlreadyDeleted() {
-        // Given - 已删除的活动可以再次"删除"（幂等）
+        // Given
         testEvent.setDeleted(1);
         when(eventsMapper.selectById(1L)).thenReturn(testEvent);
-        when(eventsMapper.updateById(any(Events.class))).thenReturn(1);
 
-        // When - 不抛异常，允许重复软删除
-        eventsService.deleteEvent(1L, 1L);
+        // When & Then
+        assertThrows(BusinessException.class, () -> {
+            eventsService.deleteEvent(1L, 1L);
+        });
 
-        // Then
         verify(eventsMapper).selectById(1L);
-        verify(eventsMapper).updateById(any(Events.class));
+        verify(eventsMapper, never()).updateById(any());
     }
 
     @Test
