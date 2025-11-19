@@ -14,11 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import cn.dev33.satoken.secure.BCrypt;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -37,7 +37,6 @@ class UsersServiceTest {
     @Mock
     private UsersMapper usersMapper;
 
-    @InjectMocks
     private UsersServiceImpl usersService;
 
     private UserRegisterDTO registerDTO;
@@ -46,6 +45,10 @@ class UsersServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 手动创建Service实例并注入Mock
+        usersService = new UsersServiceImpl();
+        ReflectionTestUtils.setField(usersService, "baseMapper", usersMapper);
+
         // 准备注册DTO
         registerDTO = new UserRegisterDTO();
         registerDTO.setUsername("testuser");
