@@ -6,6 +6,7 @@ import com.utm.what2do.annotation.CheckRole;
 import com.utm.what2do.common.response.ResultVO;
 import com.utm.what2do.constant.RoleConstants;
 import com.utm.what2do.model.vo.EventCardVO;
+import com.utm.what2do.model.vo.PostVO;
 import com.utm.what2do.service.FavoritesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,15 +17,71 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 收藏管理Controller（只支持收藏活动）
+ * 收藏管理Controller
  */
-@Tag(name = "收藏管理", description = "活动收藏、取消收藏等API")
+@Tag(name = "收藏管理", description = "帖子和活动的收藏、取消收藏等API")
 @RestController
 @RequestMapping("/api/v1/favorites")
 @RequiredArgsConstructor
 public class FavoriteController {
 
     private final FavoritesService favoritesService;
+
+    // ========== 帖子收藏 ==========
+
+    /**
+     * 收藏帖子
+     */
+    @Operation(summary = "收藏帖子", description = "收藏指定帖子")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @PostMapping("/posts/{postId}")
+    public ResultVO<Void> favoritePost(@PathVariable Long postId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        favoritesService.favoritePost(userId, postId);
+        return ResultVO.success("收藏成功");
+    }
+
+    /**
+     * 取消收藏帖子
+     */
+    @Operation(summary = "取消收藏帖子", description = "取消收藏指定帖子")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @DeleteMapping("/posts/{postId}")
+    public ResultVO<Void> unfavoritePost(@PathVariable Long postId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        favoritesService.unfavoritePost(userId, postId);
+        return ResultVO.success("取消收藏成功");
+    }
+
+    /**
+     * 检查是否已收藏帖子
+     */
+    @Operation(summary = "检查帖子收藏状态", description = "检查当前用户是否已收藏指定帖子")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @GetMapping("/posts/{postId}/check")
+    public ResultVO<Map<String, Boolean>> checkPostFavorite(@PathVariable Long postId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        boolean isFavorite = favoritesService.isFavoritePost(userId, postId);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("isFavorite", isFavorite);
+        return ResultVO.success(result);
+    }
+
+    /**
+     * 获取收藏的帖子列表
+     */
+    @Operation(summary = "获取收藏的帖子", description = "获取当前用户收藏的帖子列表")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @GetMapping("/posts")
+    public ResultVO<Page<PostVO>> getFavoritePosts(
+            @RequestParam(defaultValue = "1") Long current,
+            @RequestParam(defaultValue = "10") Long size) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        Page<PostVO> page = favoritesService.getFavoritePosts(userId, current, size);
+        return ResultVO.success(page);
+    }
+
+    // ========== 活动收藏 ==========
 
     /**
      * 收藏活动
@@ -77,6 +134,8 @@ public class FavoriteController {
         Page<EventCardVO> page = favoritesService.getFavoriteEvents(userId, current, size);
         return ResultVO.success(page);
     }
+
+    // ========== 统计 ==========
 
     /**
      * 获取收藏统计
