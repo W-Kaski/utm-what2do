@@ -15,9 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,6 @@ class PostsServiceTest {
     @Mock
     private PostTagsMapper postTagsMapper;
 
-    @InjectMocks
     private PostsServiceImpl postsService;
 
     private PostCreateDTO postCreateDTO;
@@ -52,6 +51,10 @@ class PostsServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 手动创建Service实例并注入Mock
+        postsService = new PostsServiceImpl(postMediaMapper, postTagsMapper);
+        ReflectionTestUtils.setField(postsService, "baseMapper", postsMapper);
+
         // 准备测试数据
         postCreateDTO = new PostCreateDTO();
         postCreateDTO.setContent("这是一条测试帖子内容");
