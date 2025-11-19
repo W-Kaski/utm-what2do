@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -104,9 +106,15 @@ public class FavoritesServiceImpl extends ServiceImpl<EventFavoritesMapper, Even
                 vo.setId(event.getId());
                 vo.setTitle(event.getTitle());
                 vo.setSlug(event.getSlug());
-                vo.setCoverUrl(event.getCover_url());
-                vo.setStartTime(event.getStart_time());
-                vo.setEndTime(event.getEnd_time());
+                // Convert Date to LocalDateTime
+                if (event.getStart_time() != null) {
+                    vo.setStartTime(event.getStart_time().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
+                }
+                if (event.getEnd_time() != null) {
+                    vo.setEndTime(event.getEnd_time().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
+                }
                 return vo;
             })
             .filter(vo -> vo != null)
