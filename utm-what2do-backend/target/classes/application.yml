@@ -1,36 +1,107 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: utm-what2do-backend
+  profiles:
+    active: dev
   datasource:
-    url: jdbc:mysql://localhost:3306/
+    url: jdbc:mysql://localhost:3306/utm-what2do?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  # Redis配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2000ms
+  # 缓存配置
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=600s
 
 mybatis-plus:
   mapper-locations: classpath*:mapper/xml/*Mapper.xml
   type-aliases-package: com.utm.what2do.model.entity
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+      id-type: auto
+
+# Sa-Token配置
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: satoken
+  # token有效期，单位秒，-1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期)，单位秒
+  activity-timeout: 1800
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+  # 是否从cookie中读取token
+  is-read-cookie: false
+  # 是否从请求头中读取token
+  is-read-header: true
+  # token前缀
+  token-prefix: Bearer
+
+# Knife4j配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+  production: false
 
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.utm.what2do.controller
 
 cors:
   allowed-origins:
     - "http://localhost:3000"
+    - "http://localhost:5173"
   allowed-methods:
     - GET
     - POST
@@ -40,3 +111,9 @@ cors:
   allowed-headers:
     - "*"
   allow-credentials: true
+
+# 日志配置
+logging:
+  level:
+    com.utm.what2do: debug
+    com.utm.what2do.mapper: debug
