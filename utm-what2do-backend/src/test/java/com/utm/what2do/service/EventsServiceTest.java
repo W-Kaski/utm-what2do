@@ -16,11 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -51,7 +51,6 @@ class EventsServiceTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
-    @InjectMocks
     private EventsServiceImpl eventsService;
 
     private EventCreateDTO eventCreateDTO;
@@ -61,6 +60,13 @@ class EventsServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 手动创建Service实例并注入Mock
+        eventsService = new EventsServiceImpl(redisTemplate, buildingsService, clubsService);
+        ReflectionTestUtils.setField(eventsService, "baseMapper", eventsMapper);
+
+        // Mock Redis operations (lenient for tests that don't use it)
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
         // 准备测试数据
         eventCreateDTO = new EventCreateDTO();
         eventCreateDTO.setTitle("测试活动");
@@ -102,9 +108,6 @@ class EventsServiceTest {
         testEvent.setDeleted(0);
         testEvent.setCreated_at(new Date());
         testEvent.setUpdated_at(new Date());
-
-        // Mock Redis operations
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
     @Test
