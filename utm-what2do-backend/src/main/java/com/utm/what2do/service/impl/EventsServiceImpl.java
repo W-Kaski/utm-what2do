@@ -406,11 +406,16 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
 
         // 建筑信息
         try {
-            Buildings building = buildingsService.getById(Long.parseLong(event.getBuilding_id()));
+            Buildings building = buildingsService.getById(event.getBuilding_id());
             if (building != null) {
-                vo.setBuildingId(building.getId());
+                // Convert String ID to Long for VO
+                try {
+                    vo.setBuildingId(Long.parseLong(building.getId()));
+                } catch (NumberFormatException e) {
+                    log.warn("无法将建筑ID转换为Long: {}", building.getId());
+                }
                 vo.setBuildingName(building.getName());
-                vo.setBuildingAddress(building.getAddress());
+                vo.setBuildingAddress(building.getCampus_zone());
             }
         } catch (Exception e) {
             log.warn("获取建筑信息失败: buildingId={}", event.getBuilding_id(), e);
@@ -424,7 +429,7 @@ public class EventsServiceImpl extends ServiceImpl<EventsMapper, Events>
             vo.setOrganizerType("CLUB");
             vo.setOrganizerName(club.getName());
             vo.setOrganizerLogo(club.getLogo_url());
-            vo.setOrganizerBio(club.getBio());
+            vo.setOrganizerBio(club.getDescription());
         }
 
         vo.setRegistrationUrl(event.getRegistration_notes());
