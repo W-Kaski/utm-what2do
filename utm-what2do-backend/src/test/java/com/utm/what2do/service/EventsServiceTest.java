@@ -136,7 +136,7 @@ class EventsServiceTest {
         assertEquals("test-event", result.getSlug());
         assertEquals("DH2010", result.getRoom());
 
-        verify(buildingsService).getById("1");
+        verify(buildingsService, times(2)).getById("1"); // validation + convertToDetailVO
         verify(clubsService).getById(1L);
         verify(eventsMapper).insert(any(Events.class));
     }
