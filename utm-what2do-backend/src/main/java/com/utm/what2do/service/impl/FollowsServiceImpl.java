@@ -44,7 +44,7 @@ public class FollowsServiceImpl extends ServiceImpl<FollowsMapper, Follows>
 
         // 检查是否已关注
         if (isFollowingClub(userId, clubId)) {
-            throw new BusinessException(StatusCode.BAD_REQUEST, "已关注该社团");
+            throw new BusinessException(StatusCode.BAD_REQUEST.getCode(), "已关注该社团");
         }
 
         // 创建关注关系
@@ -77,7 +77,7 @@ public class FollowsServiceImpl extends ServiceImpl<FollowsMapper, Follows>
 
         Follows follow = this.getOne(wrapper);
         if (follow == null) {
-            throw new BusinessException(StatusCode.BAD_REQUEST, "未关注该社团");
+            throw new BusinessException(StatusCode.BAD_REQUEST.getCode(), "未关注该社团");
         }
 
         this.removeById(follow.getId());
