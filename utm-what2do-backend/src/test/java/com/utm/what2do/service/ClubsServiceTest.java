@@ -201,7 +201,7 @@ class ClubsServiceTest {
     @DisplayName("根据slug获取社团详情 - 成功")
     void getClubDetailBySlug_Success() {
         // Given
-        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testClub);
+        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(testClub);
         when(eventsMapper.selectList(any(LambdaQueryWrapper.class)))
             .thenReturn(upcomingEvents);
 
@@ -213,24 +213,21 @@ class ClubsServiceTest {
         assertEquals("utm-cssa", result.getSlug());
         assertEquals("UTM中国学生学者联合会", result.getName());
 
-        verify(clubsMapper).selectOne(argThat(wrapper -> {
-            // 验证查询条件包含slug
-            return true;
-        }));
+        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
     }
 
     @Test
     @DisplayName("根据slug获取社团详情 - 社团不存在")
     void getClubDetailBySlug_NotFound() {
         // Given
-        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(clubsMapper.selectOne(any(LambdaQueryWrapper.class), anyBoolean())).thenReturn(null);
 
         // When & Then
         assertThrows(BusinessException.class, () -> {
             clubsService.getClubDetailBySlug("non-existent-club");
         });
 
-        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class));
+        verify(clubsMapper).selectOne(any(LambdaQueryWrapper.class), anyBoolean());
         verify(eventsMapper, never()).selectList(any());
     }
 
