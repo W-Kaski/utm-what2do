@@ -26,16 +26,16 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-
+        // 创建ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
         // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         // 指定序列化输入的类型，类必须是非final修饰的
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
-        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
+            new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
 
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
