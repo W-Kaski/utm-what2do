@@ -46,7 +46,7 @@ public class FavoritesServiceImpl extends ServiceImpl<EventFavoritesMapper, Even
 
         // 检查是否已收藏
         if (isFavoriteEvent(userId, eventId)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "已收藏该活动");
+            throw new BusinessException(StatusCode.BAD_REQUEST, "已收藏该活动");
         }
 
         // 创建收藏
@@ -70,7 +70,7 @@ public class FavoritesServiceImpl extends ServiceImpl<EventFavoritesMapper, Even
 
         EventFavorites favorite = this.getOne(wrapper);
         if (favorite == null) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "未收藏该活动");
+            throw new BusinessException(StatusCode.BAD_REQUEST, "未收藏该活动");
         }
 
         this.removeById(favorite.getId());

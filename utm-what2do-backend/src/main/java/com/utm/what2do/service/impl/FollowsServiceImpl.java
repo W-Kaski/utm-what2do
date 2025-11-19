@@ -44,7 +44,7 @@ public class FollowsServiceImpl extends ServiceImpl<FollowsMapper, Follows>
 
         // 检查是否已关注
         if (isFollowingClub(userId, clubId)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "已关注该社团");
+            throw new BusinessException(StatusCode.BAD_REQUEST, "已关注该社团");
         }
 
         // 创建关注关系
@@ -77,7 +77,7 @@ public class FollowsServiceImpl extends ServiceImpl<FollowsMapper, Follows>
 
         Follows follow = this.getOne(wrapper);
         if (follow == null) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "未关注该社团");
+            throw new BusinessException(StatusCode.BAD_REQUEST, "未关注该社团");
         }
 
         this.removeById(follow.getId());
@@ -114,7 +114,7 @@ public class FollowsServiceImpl extends ServiceImpl<FollowsMapper, Follows>
         voPage.setRecords(followPage.getRecords().stream()
             .map(follow -> {
                 try {
-                    return clubsService.getClubDetailById(follow.getTarget_id());
+                    return clubsService.getClubDetail(follow.getTarget_id());
                 } catch (Exception e) {
                     return null;
                 }
