@@ -2,13 +2,13 @@ package com.utm.what2do.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.utm.what2do.model.entity.Favorites;
+import com.utm.what2do.model.entity.EventFavorites;
 import com.utm.what2do.model.vo.EventCardVO;
 
 /**
- * 收藏Service（只支持收藏活动）
+ * 活动收藏Service
  */
-public interface FavoritesService extends IService<Favorites> {
+public interface FavoritesService extends IService<EventFavorites> {
 
     /**
      * 收藏活动

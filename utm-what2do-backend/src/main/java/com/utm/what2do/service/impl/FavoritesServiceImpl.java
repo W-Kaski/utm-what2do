@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.utm.what2do.common.exception.BusinessException;
 import com.utm.what2do.common.response.StatusCode;
-import com.utm.what2do.mapper.FavoritesMapper;
+import com.utm.what2do.mapper.EventFavoritesMapper;
+import com.utm.what2do.model.entity.EventFavorites;
 import com.utm.what2do.model.entity.Events;
-import com.utm.what2do.model.entity.Favorites;
 import com.utm.what2do.model.entity.Users;
 import com.utm.what2do.model.vo.EventCardVO;
 import com.utm.what2do.service.EventsService;
@@ -22,18 +22,16 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 /**
- * 收藏Service实现（只支持收藏活动）
+ * 活动收藏Service实现
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FavoritesServiceImpl extends ServiceImpl<FavoritesMapper, Favorites>
+public class FavoritesServiceImpl extends ServiceImpl<EventFavoritesMapper, EventFavorites>
     implements FavoritesService {
 
     private final EventsService eventsService;
     private final UsersService usersService;
-
-    private static final String TYPE_EVENT = "EVENT";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,10 +48,9 @@ public class FavoritesServiceImpl extends ServiceImpl<FavoritesMapper, Favorites
         }
 
         // 创建收藏
-        Favorites favorite = new Favorites();
+        EventFavorites favorite = new EventFavorites();
         favorite.setUser_id(userId);
-        favorite.setTarget_type(TYPE_EVENT);
-        favorite.setTarget_id(eventId);
+        favorite.setEvent_id(eventId);
         favorite.setCreated_at(new Date());
 
         this.save(favorite);
@@ -65,12 +62,11 @@ public class FavoritesServiceImpl extends ServiceImpl<FavoritesMapper, Favorites
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void unfavoriteEvent(Long userId, Long eventId) {
-        LambdaQueryWrapper<Favorites> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Favorites::getUser_id, userId)
-               .eq(Favorites::getTarget_type, TYPE_EVENT)
-               .eq(Favorites::getTarget_id, eventId);
+        LambdaQueryWrapper<EventFavorites> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EventFavorites::getUser_id, userId)
+               .eq(EventFavorites::getEvent_id, eventId);
 
-        Favorites favorite = this.getOne(wrapper);
+        EventFavorites favorite = this.getOne(wrapper);
         if (favorite == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "未收藏该活动");
         }
@@ -83,28 +79,26 @@ public class FavoritesServiceImpl extends ServiceImpl<FavoritesMapper, Favorites
 
     @Override
     public boolean isFavoriteEvent(Long userId, Long eventId) {
-        LambdaQueryWrapper<Favorites> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Favorites::getUser_id, userId)
-               .eq(Favorites::getTarget_type, TYPE_EVENT)
-               .eq(Favorites::getTarget_id, eventId);
+        LambdaQueryWrapper<EventFavorites> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EventFavorites::getUser_id, userId)
+               .eq(EventFavorites::getEvent_id, eventId);
         return this.count(wrapper) > 0;
     }
 
     @Override
     public Page<EventCardVO> getFavoriteEvents(Long userId, Long current, Long size) {
-        Page<Favorites> page = new Page<>(current, size);
-        LambdaQueryWrapper<Favorites> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Favorites::getUser_id, userId)
-               .eq(Favorites::getTarget_type, TYPE_EVENT)
-               .orderByDesc(Favorites::getCreated_at);
+        Page<EventFavorites> page = new Page<>(current, size);
+        LambdaQueryWrapper<EventFavorites> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EventFavorites::getUser_id, userId)
+               .orderByDesc(EventFavorites::getCreated_at);
 
-        Page<Favorites> favoritePage = this.page(page, wrapper);
+        Page<EventFavorites> favoritePage = this.page(page, wrapper);
 
         Page<EventCardVO> voPage = new Page<>(current, size);
         voPage.setTotal(favoritePage.getTotal());
         voPage.setRecords(favoritePage.getRecords().stream()
             .map(fav -> {
-                Events event = eventsService.getById(fav.getTarget_id());
+                Events event = eventsService.getById(fav.getEvent_id());
                 if (event == null || event.getDeleted() == 1) return null;
                 EventCardVO vo = new EventCardVO();
                 vo.setId(event.getId());
@@ -123,8 +117,8 @@ public class FavoritesServiceImpl extends ServiceImpl<FavoritesMapper, Favorites
 
     @Override
     public Long getFavoriteCount(Long userId) {
-        LambdaQueryWrapper<Favorites> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Favorites::getUser_id, userId);
+        LambdaQueryWrapper<EventFavorites> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EventFavorites::getUser_id, userId);
         return this.count(wrapper);
     }
 
