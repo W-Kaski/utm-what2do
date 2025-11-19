@@ -89,12 +89,12 @@ public class SaTokenUtil {
     }
 
     /**
-     * 为用户添加角色
-     * @param loginId 用户ID
+     * 为用户设置角色（通过Session）
+     * @param userId 用户ID
      * @param role 角色标识
      */
-    public static void addRole(Object loginId, String role) {
-        StpUtil.getStpLogic().getStpInterface().getRoleList(loginId, "");
+    public static void setRole(Long userId, String role) {
+        StpUtil.getSessionByLoginId(userId).set("role", role);
     }
 
     /**
