@@ -20,7 +20,13 @@
         <div class="header-actions">
           <RouterLink to="/events/new" class="pill-link">Create Event</RouterLink>
 
-          <div class="profile" ref="menuRef">
+          <!-- Not logged in: Show Sign In button -->
+          <RouterLink v-if="!userStore.isAuthenticated" to="/login" class="sign-in-btn">
+            Sign In
+          </RouterLink>
+
+          <!-- Logged in: Show user menu -->
+          <div v-else class="profile" ref="menuRef">
             <button
               class="avatar-button"
               type="button"
@@ -28,7 +34,7 @@
               :aria-expanded="menuOpen"
               @click="toggleMenu"
             >
-              <span class="avatar-initials">UT</span>
+              <span class="avatar-initials">{{ userInitials }}</span>
               <span class="status-dot" aria-hidden="true"></span>
             </button>
 
@@ -40,7 +46,7 @@
             >
               <div class="dropdown__header">
                 <p>Welcome back</p>
-                <strong>UTM Explorer</strong>
+                <strong>{{ userStore.name }}</strong>
               </div>
               <div class="dropdown__body">
                 <RouterLink
@@ -50,9 +56,8 @@
                 >
                   View profile
                 </RouterLink>
-                <button type="button" role="menuitem" @click="handleAction('login')">Sign in / Switch account</button>
                 <button type="button" role="menuitem" @click="handleAction('settings')">Settings</button>
-                <button type="button" role="menuitem" @click="handleAction('logout')">Sign out</button>
+                <button type="button" role="menuitem" class="logout-btn" @click="handleLogout">Sign out</button>
               </div>
             </div>
           </div>
@@ -68,15 +73,28 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
 const appName = computed(() => import.meta.env.VITE_APP_NAME || 'UTM What2Do');
 const menuOpen = ref(false);
 const menuRef = ref(null);
 const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+
 const communityActive = computed(() =>
   ['feed', 'search', 'post-create', 'post-detail'].includes(route.name)
 );
+
+const userInitials = computed(() => {
+  const name = userStore.name || 'User';
+  const parts = name.split(' ');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+});
 
 const closeMenu = () => {
   menuOpen.value = false;
@@ -96,6 +114,12 @@ const handleOutsideClick = (event) => {
 const handleAction = (action) => {
   console.info(`[profile-menu] ${action} from ${appName.value}`);
   closeMenu();
+};
+
+const handleLogout = async () => {
+  closeMenu();
+  await userStore.logout();
+  router.push({ name: 'home' });
 };
 
 onMounted(() => {
@@ -194,6 +218,21 @@ onBeforeUnmount(() => {
   background: rgba(37, 99, 235, 0.08);
 }
 
+.sign-in-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.sign-in-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
 .profile {
   position: relative;
 }
@@ -211,6 +250,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   position: relative;
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+  cursor: pointer;
 }
 
 .avatar-initials {
@@ -271,6 +311,7 @@ onBeforeUnmount(() => {
   color: #1e293b;
   font-weight: 500;
   text-decoration: none;
+  cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -278,6 +319,11 @@ onBeforeUnmount(() => {
 .dropdown__body button:hover {
   background: rgba(37, 99, 235, 0.08);
   color: #2563eb;
+}
+
+.dropdown__body .logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
 }
 
 main {
