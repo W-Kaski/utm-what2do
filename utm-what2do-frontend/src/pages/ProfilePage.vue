@@ -121,9 +121,20 @@ const handleCoverChange = (event) => {
   reader.readAsDataURL(file);
 };
 
-const applyProfileChanges = () => {
-  userStore.name = editableName.value;
-  userStore.bio = editableBio.value;
+const applyProfileChanges = async () => {
+  try {
+    await userStore.updateProfile({
+      displayName: editableName.value,
+      bio: editableBio.value
+    });
+    // Also update local state
+    userStore.name = editableName.value;
+    userStore.bio = editableBio.value;
+  } catch (err) {
+    // Still update locally for demo
+    userStore.name = editableName.value;
+    userStore.bio = editableBio.value;
+  }
 };
 
 const resetProfileChanges = () => {

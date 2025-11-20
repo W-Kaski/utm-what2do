@@ -50,10 +50,14 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePostStore } from '@/stores/posts';
+import { useUserStore } from '@/stores/user';
 import FeedSidebar from '@/components/FeedSidebar.vue';
 
 const router = useRouter();
 const postStore = usePostStore();
+const userStore = useUserStore();
+
+const loading = ref(false);
 
 const content = ref('');
 const imageFiles = ref([]);
@@ -93,24 +97,32 @@ const removeVideo = () => {
   videoPreview.value = null;
 };
 
-const submitPost = () => {
+const submitPost = async () => {
+  loading.value = true;
+
   const media = imageFiles.value.length
     ? { type: 'images', items: imagePreviews.value }
     : videoFile.value
       ? { type: 'video', items: [videoPreview.value], thumbnail: videoPreview.value }
       : null;
 
-  const newId = postStore.createPost({
-    author: {
-      id: 'current',
-      name: 'UTM Explorer',
-      avatar: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80'
-    },
-    content: content.value,
-    media
-  });
+  try {
+    const newId = await postStore.createPost({
+      author: {
+        id: userStore.id || 'current',
+        name: userStore.name || 'UTM Explorer',
+        avatar: userStore.avatar || 'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80'
+      },
+      content: content.value,
+      media
+    });
 
-  router.push({ name: 'post-detail', params: { id: newId } });
+    router.push({ name: 'post-detail', params: { id: newId } });
+  } catch (err) {
+    console.error('Failed to create post:', err);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const goHome = () => {
