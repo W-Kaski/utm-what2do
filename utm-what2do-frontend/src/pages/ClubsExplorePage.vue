@@ -68,11 +68,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { clubCategories, clubs } from '@/data/clubs';
+import { clubCategories } from '@/data/clubs';
+import { useClubStore } from '@/stores/clubs';
 import { HOT_CLUB_THRESHOLD } from '@/constants/highlights';
+
+const clubStore = useClubStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -93,16 +96,20 @@ watch(hotFilterActive, (active) => {
 
 const categories = clubCategories;
 
+onMounted(() => {
+  clubStore.fetchClubs();
+});
+
 const filteredClubs = computed(() => {
   const term = search.value.trim().toLowerCase();
-  return clubs.filter((club) => {
+  return clubStore.allClubs.filter((club) => {
     const categoryMatch = selectedCategory.value ? club.category === selectedCategory.value : true;
     const searchMatch =
       !term ||
       club.name.toLowerCase().includes(term) ||
-      club.blurb.toLowerCase().includes(term) ||
-      club.tags.some((tag) => tag.toLowerCase().includes(term));
-    const hotMatch = hotFilterActive.value ? Number(club.stats?.members || 0) >= HOT_CLUB_THRESHOLD : true;
+      (club.blurb || '').toLowerCase().includes(term) ||
+      (club.tags || []).some((tag) => tag.toLowerCase().includes(term));
+    const hotMatch = hotFilterActive.value ? Number(club.stats?.members || club.membersCount || 0) >= HOT_CLUB_THRESHOLD : true;
     return categoryMatch && searchMatch && hotMatch;
   });
 });
