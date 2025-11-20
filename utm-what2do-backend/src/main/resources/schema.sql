@@ -127,16 +127,16 @@ CREATE TABLE IF NOT EXISTS event_tags (
 --     CONSTRAINT fk_event_registrations_user FOREIGN KEY (user_id) REFERENCES users (id)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- CREATE TABLE IF NOT EXISTS event_favorites (
---     id BIGINT PRIMARY KEY AUTO_INCREMENT,
---     user_id BIGINT NOT NULL,
---     event_id BIGINT NOT NULL,
---     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     UNIQUE KEY uk_event_favorites_user_event (user_id, event_id),
---     KEY idx_event_favorites_event (event_id),
---     CONSTRAINT fk_event_favorites_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
---     CONSTRAINT fk_event_favorites_event FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS event_favorites (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_event_favorites_user_event (user_id, event_id),
+    KEY idx_event_favorites_event (event_id),
+    CONSTRAINT fk_event_favorites_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_favorites_event FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS follows ( 
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
