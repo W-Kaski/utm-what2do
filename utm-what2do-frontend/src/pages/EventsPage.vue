@@ -144,7 +144,11 @@ const syncFromQuery = () => {
   }
 };
 
-onMounted(syncFromQuery);
+onMounted(() => {
+  syncFromQuery();
+  eventStore.fetchEvents();
+});
+
 watch(
   () => [route.query.search, route.query.tag],
   () => {

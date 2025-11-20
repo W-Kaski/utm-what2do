@@ -47,6 +47,20 @@
         />
       </template>
 
+      <template v-else-if="activeTab === 'events'">
+        <article v-for="event in filteredEvents" :key="event.id" class="event-result-card" @click="goToEvent(event.id)">
+          <img v-if="event.coverImage" :src="event.coverImage" :alt="event.title" class="event-thumb" />
+          <div class="event-info">
+            <h3>{{ event.title }}</h3>
+            <p>{{ event.description }}</p>
+            <div class="event-meta">
+              <span>{{ event.date }}</span>
+              <span>{{ event.location }}</span>
+            </div>
+          </div>
+        </article>
+      </template>
+
       <template v-else-if="activeTab === 'users'">
         <article v-for="club in filteredClubs" :key="club.id" class="user-card" @click="goToClub(club.id)">
           <img :src="club.logo" :alt="club.name" />
@@ -77,11 +91,15 @@ import { useRouter } from 'vue-router';
 
 import PostCard from '@/components/PostCard.vue';
 import { usePostStore } from '@/stores/posts';
+import { useEventStore } from '@/stores/events';
+import { useClubStore } from '@/stores/clubs';
 import { clubs } from '@/data/clubs';
 import FeedSidebar from '@/components/FeedSidebar.vue';
 
 const router = useRouter();
 const postStore = usePostStore();
+const eventStore = useEventStore();
+const clubStore = useClubStore();
 
 const query = ref('');
 const showSuggestions = ref(false);
@@ -90,9 +108,20 @@ const activeTab = ref('posts');
 
 const tabs = [
   { id: 'posts', label: 'Posts' },
-  { id: 'users', label: 'Users' },
+  { id: 'events', label: 'Events' },
+  { id: 'users', label: 'Clubs' },
   { id: 'tags', label: 'Tags' }
 ];
+
+const filteredEvents = computed(() => {
+  const term = query.value.trim().toLowerCase();
+  return eventStore.events.filter(
+    (event) =>
+      event.title.toLowerCase().includes(term) ||
+      event.description.toLowerCase().includes(term) ||
+      (event.tags || []).some(tag => tag.toLowerCase().includes(term))
+  );
+});
 
 const filteredPosts = computed(() => {
   const term = query.value.trim().toLowerCase();
@@ -129,9 +158,14 @@ const filteredTags = computed(() => {
 
 const hasResults = computed(() => {
   if (activeTab.value === 'posts') return filteredPosts.value.length > 0;
+  if (activeTab.value === 'events') return filteredEvents.value.length > 0;
   if (activeTab.value === 'users') return filteredClubs.value.length > 0;
   return filteredTags.value.length > 0;
 });
+
+const goToEvent = (id) => {
+  router.push({ name: 'event-detail', params: { id } });
+};
 
 watch(query, (value) => {
   if (!value) {
@@ -299,6 +333,46 @@ const goToFollowing = () => {
   height: 56px;
   border-radius: 999px;
   object-fit: cover;
+}
+
+.event-result-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  gap: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.event-result-card:hover {
+  transform: translateY(-2px);
+}
+
+.event-thumb {
+  width: 120px;
+  height: 80px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+}
+
+.event-info h3 {
+  margin: 0 0 0.25rem;
+  color: #0f172a;
+}
+
+.event-info p {
+  margin: 0 0 0.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.event-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
 }
 
 .event-card header {

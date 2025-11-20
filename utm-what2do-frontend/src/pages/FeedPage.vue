@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import FeedSidebar from '@/components/FeedSidebar.vue';
@@ -75,6 +75,10 @@ const showFollowing = () => {
 const showHome = () => {
   setTab('all');
 };
+
+onMounted(() => {
+  postStore.fetchPosts();
+});
 
 watch(
   () => route.query.tab,
