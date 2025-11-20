@@ -13,9 +13,11 @@ import PostDetailPage from '@/pages/PostDetailPage.vue';
 import PostCreatePage from '@/pages/PostCreatePage.vue';
 import SearchPage from '@/pages/SearchPage.vue';
 import UserDetailPage from '@/pages/UserDetailPage.vue';
+import LoginPage from '@/pages/LoginPage.vue';
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
+  { path: '/login', name: 'login', component: LoginPage },
   { path: '/map', name: 'map', component: MapPage },
   { path: '/events', name: 'events', component: EventsPage },
   { path: '/explore', name: 'explore', component: EventsPage },
