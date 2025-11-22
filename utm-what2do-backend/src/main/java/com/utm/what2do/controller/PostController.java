@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.utm.what2do.annotation.CheckRole;
 import com.utm.what2do.common.response.ResultVO;
 import com.utm.what2do.constant.RoleConstants;
+import com.utm.what2do.model.dto.PostCommentDTO;
 import com.utm.what2do.model.dto.PostCreateDTO;
+import com.utm.what2do.model.vo.PostCommentVO;
 import com.utm.what2do.model.vo.PostVO;
 import com.utm.what2do.service.PostsService;
+
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,12 +32,14 @@ public class PostController {
     /**
      * 获取帖子列表（分页）
      */
-    @Operation(summary = "获取帖子列表", description = "分页获取帖子列表，置顶帖子优先显示")
+    @Operation(summary = "获取帖子列表", description = "分页获取帖子列表，支持排序和标签筛选")
     @GetMapping
     public ResultVO<Page<PostVO>> getPostList(
             @RequestParam(defaultValue = "1") Long current,
-            @RequestParam(defaultValue = "10") Long size) {
-        Page<PostVO> page = postsService.getPostList(current, size);
+            @RequestParam(defaultValue = "10") Long size,
+            @RequestParam(defaultValue = "latest") String sortBy,
+            @RequestParam(required = false) String tag) {
+        Page<PostVO> page = postsService.getPostList(current, size, sortBy, tag);
         return ResultVO.success(page);
     }
 
@@ -94,5 +100,41 @@ public class PostController {
         Long userId = StpUtil.getLoginIdAsLong();
         postsService.pinPost(id, userId, pinned);
         return ResultVO.success(pinned ? "置顶成功" : "取消置顶成功");
+    }
+
+    /**
+     * 发布评论
+     */
+    @Operation(summary = "发布评论", description = "在帖子下发布评论")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @PostMapping("/{id}/comments")
+    public ResultVO<PostCommentVO> addComment(
+            @PathVariable Long id,
+            @Valid @RequestBody PostCommentDTO dto) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        PostCommentVO comment = postsService.addComment(id, dto, userId);
+        return ResultVO.success("评论发布成功", comment);
+    }
+
+    /**
+     * 获取评论列表
+     */
+    @Operation(summary = "获取评论列表", description = "获取帖子下的所有评论")
+    @GetMapping("/{id}/comments")
+    public ResultVO<List<PostCommentVO>> getComments(@PathVariable Long id) {
+        List<PostCommentVO> comments = postsService.getComments(id);
+        return ResultVO.success(comments);
+    }
+
+    /**
+     * 删除评论
+     */
+    @Operation(summary = "删除评论", description = "删除自己发布的评论")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @DeleteMapping("/comments/{commentId}")
+    public ResultVO<Void> deleteComment(@PathVariable Long commentId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        postsService.deleteComment(commentId, userId);
+        return ResultVO.success("评论删除成功");
     }
 }

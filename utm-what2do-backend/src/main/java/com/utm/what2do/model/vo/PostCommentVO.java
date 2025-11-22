@@ -18,6 +18,8 @@ public class PostCommentVO {
     private Long id;
     private Long postId;
     private Long userId;
+    private String authorName;
+    private String authorAvatar;
     private String content;
     private Long parentCommentId;
     private Integer likesCount;
