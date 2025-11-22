@@ -43,6 +43,14 @@ export const useUserStore = defineStore('user', {
       this.error = null;
       try {
         const response = await authService.register(userData);
+        // Backend returns token and user info on successful registration
+        if (response?.data?.token) {
+          localStorage.setItem('auth_token', response.data.token);
+          localStorage.setItem('user_info', JSON.stringify(response.data.user));
+        }
+        if (response?.data?.user) {
+          this.setUser(response.data.user);
+        }
         return response;
       } catch (err) {
         this.error = err.response?.data?.message || 'Registration failed';

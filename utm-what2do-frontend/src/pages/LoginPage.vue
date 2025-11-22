@@ -120,14 +120,10 @@ const handleSubmit = async () => {
         password: form.password
       });
     } else {
+      // Registration already logs in the user on backend
       await userStore.register({
         username: form.username,
         email: form.email,
-        password: form.password
-      });
-      // After registration, login automatically
-      await userStore.login({
-        username: form.username,
         password: form.password
       });
     }
