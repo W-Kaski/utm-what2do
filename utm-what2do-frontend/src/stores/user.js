@@ -26,12 +26,16 @@ export const useUserStore = defineStore('user', {
       this.error = null;
       try {
         const response = await authService.login(credentials);
-        if (response?.data?.user) {
-          this.setUser(response.data.user);
+        // response = {code, message, data: {token, user}}
+        const userData = response?.data?.user;
+        if (userData) {
+          this.setUser(userData);
         }
+        // Also update isAuthenticated based on token
+        this.isAuthenticated = authService.isAuthenticated();
         return response;
       } catch (err) {
-        this.error = err.response?.data?.message || 'Login failed';
+        this.error = err.response?.data?.message || err.message || 'Login failed';
         throw err;
       } finally {
         this.loading = false;
