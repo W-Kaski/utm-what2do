@@ -14,6 +14,9 @@
           <RouterLink :to="{ name: 'feed' }" :class="{ 'router-link-active': communityActive }">
             Community
           </RouterLink>
+          <RouterLink v-if="isAdmin" to="/admin" class="admin-link">
+            Admin
+          </RouterLink>
         </nav>
 
         <div class="header-actions">
@@ -79,6 +82,10 @@ const userStore = useUserStore();
 
 const communityActive = computed(() =>
   ['feed', 'search', 'post-create', 'post-detail'].includes(route.name)
+);
+
+const isAdmin = computed(() =>
+  userStore.isAuthenticated && userStore.role === 'ADMIN'
 );
 
 const userInitials = computed(() => {
@@ -198,6 +205,15 @@ onBeforeUnmount(() => {
 .primary-nav a.router-link-active {
   color: #111827;
   border-color: #2563eb;
+}
+
+.admin-link {
+  color: #7c3aed !important;
+}
+
+.admin-link.router-link-active {
+  color: #7c3aed !important;
+  border-color: #7c3aed !important;
 }
 
 .header-actions {

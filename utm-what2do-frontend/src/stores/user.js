@@ -15,6 +15,7 @@ export const useUserStore = defineStore('user', {
     bio: 'Let inspiration spark anytime - explore campus and save the events you love',
     coverImage: defaultCover,
     avatar: defaultAvatar,
+    role: '',
     favorites: [],
     isAuthenticated: false,
     loading: false,
@@ -116,6 +117,7 @@ export const useUserStore = defineStore('user', {
       this.bio = userData.bio || this.bio;
       this.avatar = userData.avatarUrl || userData.avatar || defaultAvatar;
       this.coverImage = userData.coverUrl || userData.coverImage || defaultCover;
+      this.role = userData.role || '';
       this.isAuthenticated = true;
     },
 
@@ -127,6 +129,7 @@ export const useUserStore = defineStore('user', {
       this.bio = 'Let inspiration spark anytime - explore campus and save the events you love';
       this.coverImage = defaultCover;
       this.avatar = defaultAvatar;
+      this.role = '';
       this.isAuthenticated = false;
     },
 
