@@ -50,15 +50,10 @@
                 <strong>{{ userStore.name }}</strong>
               </div>
               <div class="dropdown__body">
-                <RouterLink
-                  to="/profile"
-                  role="menuitem"
-                  @click="closeMenu"
-                >
-                  View profile
-                </RouterLink>
-                <button type="button" role="menuitem" @click="handleAction('settings')">Settings</button>
-                <button type="button" role="menuitem" class="logout-btn" @click="handleLogout">Sign out</button>
+                <button type="button" role="menuitem" @click="goHome">
+                  Home
+                </button>
+                <button type="button" role="menuitem" class="logout-btn" @click="handleLogout">Log out</button>
               </div>
             </div>
           </div>
@@ -77,7 +72,6 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 
-const appName = computed(() => import.meta.env.VITE_APP_NAME || 'UTM What2Do');
 const menuOpen = ref(false);
 const menuRef = ref(null);
 const route = useRoute();
@@ -112,9 +106,9 @@ const handleOutsideClick = (event) => {
   }
 };
 
-const handleAction = (action) => {
-  console.info(`[profile-menu] ${action} from ${appName.value}`);
+const goHome = () => {
   closeMenu();
+  router.push({ name: 'home' });
 };
 
 const handleLogout = async () => {
@@ -123,8 +117,17 @@ const handleLogout = async () => {
   router.push({ name: 'home' });
 };
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('click', handleOutsideClick);
+
+  // If the store only has a token (e.g. on refresh) fetch the latest profile
+  if (userStore.isAuthenticated && !userStore.id) {
+    try {
+      await userStore.fetchCurrentUser();
+    } catch (err) {
+      console.error('Failed to refresh current user', err);
+    }
+  }
 });
 
 onBeforeUnmount(() => {

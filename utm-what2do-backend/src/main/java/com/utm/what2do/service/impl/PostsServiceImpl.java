@@ -76,6 +76,9 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
 
         // 设置作者（根据authorType判断是用户还是社团）
         if ("CLUB".equals(dto.getAuthorType())) {
+            if (dto.getClubId() == null) {
+                throw new BusinessException(StatusCode.BAD_REQUEST.getCode(), "社团发帖必须提供 clubId");
+            }
             post.setAuthor_club_id(dto.getClubId());
         } else {
             post.setAuthor_user_id(userId);

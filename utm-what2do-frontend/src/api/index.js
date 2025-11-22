@@ -14,7 +14,8 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      config.headers['satoken'] = token;
+      // Backend expects the satoken header with the configured Bearer prefix
+      config.headers['satoken'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
     return config;
   },

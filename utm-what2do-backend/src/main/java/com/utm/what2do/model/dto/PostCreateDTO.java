@@ -16,6 +16,11 @@ public class PostCreateDTO {
 
     private String authorType; // USER 或 CLUB
 
+    /**
+     * 若 authorType 为 CLUB，需要提供 clubId 来标识发布主体
+     */
+    private Long clubId;
+
     private List<String> mediaUrls; // 媒体资源URL列表
 
     private List<String> tags; // 帖子标签

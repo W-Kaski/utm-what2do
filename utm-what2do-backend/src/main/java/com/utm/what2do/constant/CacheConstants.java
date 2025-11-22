@@ -56,6 +56,11 @@ public class CacheConstants {
     public static final String POST_DETAIL_KEY = "post:detail:";
 
     /**
+     * 帖子列表缓存 Key 前缀
+     */
+    public static final String POST_LIST_KEY = "post:list:";
+
+    /**
      * 标签缓存 Key
      */
     public static final String TAGS_KEY = "tags:";
