@@ -23,8 +23,7 @@ public class UserRegisterDTO {
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    @NotBlank(message = "角色不能为空")
-    private String role; // USER 或 CLUB_MANAGER
+    private String role = "USER"; // 默认为普通用户，可选 CLUB_MANAGER
 
     private String displayName;
 
