@@ -19,14 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +46,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
     // 邮箱格式：基础校验
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+    // 密码加盐
+    private static final String SALT = "utm_what2do";
 
     // 使用@Lazy避免循环依赖
     public UsersServiceImpl(@Lazy FollowsService followsService, @Lazy ClubsService clubsService) {
@@ -109,11 +108,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         user.setEmail(email);
         user.setDisplay_name(displayName);
 
-        // 生成随机盐值并加密密码
-        String salt = generateSalt();
-        String hashedPassword = hashPassword(dto.getPassword(), salt);
-        user.setPassword_hash(hashedPassword);
-        user.setPassword_salt(salt);
+        // 密码加密
+        String encryptPassword = getEncryptPassword(dto.getPassword());
+        user.setPassword_hash(encryptPassword);
 
         // **安全修正：强制注册角色为 USER，CLUB_MANAGER角色通过后台分配**
         user.setRole(RoleConstants.USER);
@@ -157,11 +154,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         }
 
         // 2. 验证密码
-        String hashedInput = hashPassword(dto.getPassword(), user.getPassword_salt());
-        boolean passwordMatch = hashedInput.equals(user.getPassword_hash());
-        log.info("密码验证: username={}, match={}", dto.getUsername(), passwordMatch);
-
-        if (!passwordMatch) {
+        String encryptPassword = getEncryptPassword(dto.getPassword());
+        if (!encryptPassword.equals(user.getPassword_hash())) {
+            log.info("密码验证失败: username={}", dto.getUsername());
             throw new BusinessException(StatusCode.PASSWORD_ERROR);
         }
 
@@ -333,26 +328,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     }
 
     /**
-     * 生成随机盐值
+     * 获取加密后的密码
      */
-    private String generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
-    }
-
-    /**
-     * 使用SHA-256和盐值哈希密码
-     */
-    private String hashPassword(String password, String salt) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String saltedPassword = password + salt;
-            byte[] hash = digest.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not found", e);
-        }
+    private String getEncryptPassword(String password) {
+        return DigestUtils.md5DigestAsHex((SALT + password).getBytes(StandardCharsets.UTF_8));
     }
 }
