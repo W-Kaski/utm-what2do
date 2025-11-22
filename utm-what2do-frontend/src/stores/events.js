@@ -90,8 +90,6 @@ export const useEventStore = defineStore('events', {
       } catch (err) {
         console.error('Failed to fetch events:', err);
         this.error = err.message || 'Failed to fetch events';
-        // Fallback to mock data if API fails
-        this.events = mockEvents;
       } finally {
         this.loading = false;
       }
@@ -109,8 +107,6 @@ export const useEventStore = defineStore('events', {
       } catch (err) {
         console.error('Failed to fetch event:', err);
         this.error = err.message || 'Failed to fetch event';
-        // Fallback to mock data
-        this.selectedEvent = mockEvents.find(e => e.id === id) || null;
       } finally {
         this.loading = false;
       }

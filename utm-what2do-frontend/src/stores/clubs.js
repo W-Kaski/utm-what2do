@@ -37,8 +37,6 @@ export const useClubStore = defineStore('clubs', {
       } catch (err) {
         console.error('Failed to fetch clubs:', err);
         this.error = err.message || 'Failed to fetch clubs';
-        // Fallback to mock data
-        this.clubs = mockClubs;
       } finally {
         this.loading = false;
       }
@@ -56,8 +54,6 @@ export const useClubStore = defineStore('clubs', {
       } catch (err) {
         console.error('Failed to fetch club:', err);
         this.error = err.message || 'Failed to fetch club';
-        // Fallback to mock data
-        this.selectedClub = mockClubs.find(c => c.id === id) || null;
       } finally {
         this.loading = false;
       }

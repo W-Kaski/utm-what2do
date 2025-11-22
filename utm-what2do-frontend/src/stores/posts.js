@@ -33,8 +33,6 @@ export const usePostStore = defineStore('posts', {
       } catch (err) {
         console.error('Failed to fetch posts:', err);
         this.error = err.message || 'Failed to fetch posts';
-        // Fallback to mock data
-        this.posts = mockPosts;
       } finally {
         this.loading = false;
       }
@@ -52,8 +50,6 @@ export const usePostStore = defineStore('posts', {
       } catch (err) {
         console.error('Failed to fetch post:', err);
         this.error = err.message || 'Failed to fetch post';
-        // Fallback to mock data
-        this.selectedPost = mockPosts.find(p => p.id === id) || null;
       } finally {
         this.loading = false;
       }
