@@ -64,21 +64,26 @@ export const usePostStore = defineStore('posts', {
       const post = this.posts.find((item) => item.id === postId);
       if (!post) return;
 
+      // Save original state for rollback
+      const originalLiked = post.liked;
+      const originalLikes = post.likes;
+
+      // Optimistic update
+      post.liked = !originalLiked;
+      post.likes = originalLiked ? originalLikes - 1 : originalLikes + 1;
+
       try {
-        if (post.liked) {
+        if (originalLiked) {
           await postsService.unlikePost(postId);
-          post.liked = false;
-          post.likes -= 1;
         } else {
           await postsService.likePost(postId);
-          post.liked = true;
-          post.likes += 1;
         }
       } catch (err) {
         console.error('Failed to toggle like:', err);
-        // Optimistic update fallback for offline mode
-        post.liked = !post.liked;
-        post.likes += post.liked ? 1 : -1;
+        // Rollback on error
+        post.liked = originalLiked;
+        post.likes = originalLikes;
+        throw err;
       }
     },
 

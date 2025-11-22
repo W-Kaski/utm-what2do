@@ -65,29 +65,47 @@ export const useClubStore = defineStore('clubs', {
     },
 
     async joinClub(clubId) {
+      const club = this.clubs.find(c => c.id === clubId);
+      if (!club) return;
+
+      // Save original state for rollback
+      const originalCount = club.membersCount || 0;
+      const originalJoined = club.isJoined;
+
+      // Optimistic update
+      club.membersCount = originalCount + 1;
+      club.isJoined = true;
+
       try {
         await clubsService.joinClub(clubId);
-        const club = this.clubs.find(c => c.id === clubId);
-        if (club) {
-          club.membersCount = (club.membersCount || 0) + 1;
-          club.isJoined = true;
-        }
       } catch (err) {
         console.error('Failed to join club:', err);
+        // Rollback on error
+        club.membersCount = originalCount;
+        club.isJoined = originalJoined;
         throw err;
       }
     },
 
     async leaveClub(clubId) {
+      const club = this.clubs.find(c => c.id === clubId);
+      if (!club) return;
+
+      // Save original state for rollback
+      const originalCount = club.membersCount || 0;
+      const originalJoined = club.isJoined;
+
+      // Optimistic update
+      club.membersCount = Math.max(originalCount - 1, 0);
+      club.isJoined = false;
+
       try {
         await clubsService.leaveClub(clubId);
-        const club = this.clubs.find(c => c.id === clubId);
-        if (club) {
-          club.membersCount = Math.max((club.membersCount || 1) - 1, 0);
-          club.isJoined = false;
-        }
       } catch (err) {
         console.error('Failed to leave club:', err);
+        // Rollback on error
+        club.membersCount = originalCount;
+        club.isJoined = originalJoined;
         throw err;
       }
     },
