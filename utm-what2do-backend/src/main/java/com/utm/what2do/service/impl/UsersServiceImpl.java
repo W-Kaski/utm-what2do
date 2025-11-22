@@ -85,9 +85,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
 
     @Override
     public Map<String, Object> login(UserLoginDTO dto) {
-        // 1. 查询用户
+        // 1. 根据邮箱查询用户
         LambdaQueryWrapper<Users> query = new LambdaQueryWrapper<>();
-        query.eq(Users::getUsername, dto.getUsername());
+        query.eq(Users::getEmail, dto.getEmail());
         Users user = this.getOne(query);
 
         if (user == null) {
