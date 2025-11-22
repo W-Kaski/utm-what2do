@@ -11,18 +11,18 @@
           {{ error }}
         </div>
 
-        <div v-if="!isLogin" class="form-group">
+        <div class="form-group">
           <label for="username">Username</label>
           <input
             id="username"
             v-model="form.username"
             type="text"
-            placeholder="Choose a username"
+            :placeholder="isLogin ? 'Enter your username' : 'Choose a username'"
             required
           />
         </div>
 
-        <div class="form-group">
+        <div v-if="!isLogin" class="form-group">
           <label for="email">Email</label>
           <input
             id="email"
@@ -116,7 +116,7 @@ const handleSubmit = async () => {
   try {
     if (isLogin.value) {
       await userStore.login({
-        email: form.email,
+        username: form.username,
         password: form.password
       });
     } else {
@@ -127,7 +127,7 @@ const handleSubmit = async () => {
       });
       // After registration, login automatically
       await userStore.login({
-        email: form.email,
+        username: form.username,
         password: form.password
       });
     }
