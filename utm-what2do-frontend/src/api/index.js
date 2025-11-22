@@ -25,7 +25,18 @@ apiClient.interceptors.request.use(
 
 // Response interceptor - handle errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check business logic error code
+    if (response.data && response.data.code !== undefined && response.data.code !== 200) {
+      const error = new Error(response.data.message || 'Request failed');
+      error.response = {
+        data: response.data,
+        status: response.status
+      };
+      return Promise.reject(error);
+    }
+    return response;
+  },
   (error) => {
     if (error.response) {
       const { status } = error.response;
