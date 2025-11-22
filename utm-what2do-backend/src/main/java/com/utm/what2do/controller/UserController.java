@@ -92,4 +92,28 @@ public class UserController {
         UserInfoVO updated = usersService.updateProfile(userId, dto);
         return ResultVO.success("更新成功", updated);
     }
+
+    /**
+     * 关注社团
+     */
+    @Operation(summary = "关注社团", description = "当前用户关注指定社团")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @PostMapping("/follow/club/{id}")
+    public ResultVO<Void> followClub(@PathVariable Long id) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        usersService.followClub(userId, id);
+        return ResultVO.success("关注成功");
+    }
+
+    /**
+     * 取消关注社团
+     */
+    @Operation(summary = "取消关注社团", description = "当前用户取消关注指定社团")
+    @CheckRole({RoleConstants.USER, RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @DeleteMapping("/follow/club/{id}")
+    public ResultVO<Void> unfollowClub(@PathVariable Long id) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        usersService.unfollowClub(userId, id);
+        return ResultVO.success("取消关注成功");
+    }
 }

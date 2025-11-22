@@ -37,10 +37,31 @@ public interface UsersService extends IService<Users> {
     UserInfoVO getUserInfo(Long userId);
 
     /**
+     * 获取用户公开档案（不包含敏感信息）
+     * @param userId 用户ID
+     * @return 公开的用户信息
+     */
+    UserInfoVO getPublicProfile(Long userId);
+
+    /**
      * 更新用户档案
      * @param userId 用户ID
      * @param dto 更新信息
      * @return 更新后的用户信息
      */
     UserInfoVO updateProfile(Long userId, UserInfoVO dto);
+
+    /**
+     * 关注社团
+     * @param userId 用户ID
+     * @param clubId 社团ID
+     */
+    void followClub(Long userId, Long clubId);
+
+    /**
+     * 取消关注社团
+     * @param userId 用户ID
+     * @param clubId 社团ID
+     */
+    void unfollowClub(Long userId, Long clubId);
 }

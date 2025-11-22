@@ -24,5 +24,9 @@ public class UserInfoVO {
 
     private String role;
 
+    private Integer followingCount;
+
+    private Integer favoritesCount;
+
     private LocalDateTime createdAt;
 }
