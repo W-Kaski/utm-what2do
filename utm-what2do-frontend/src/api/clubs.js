@@ -1,13 +1,30 @@
 import apiClient from './index';
 
+// Transform backend club response to frontend format
+const transformClub = (club) => {
+  if (!club) return null;
+  return {
+    ...club,
+    membersCount: club.followersCount || 0,
+    events: club.upcomingEvents || []
+  };
+};
+
 export const clubsService = {
   async getClubs(params = {}) {
     const response = await apiClient.get('/clubs', { params });
+    if (response.data?.data?.records) {
+      response.data.data.records = response.data.data.records.map(transformClub);
+    }
     return response.data;
   },
 
+  // Fixed: Use /clubs/id/{id} instead of /clubs/{id}
   async getClubById(id) {
-    const response = await apiClient.get(`/clubs/${id}`);
+    const response = await apiClient.get(`/clubs/id/${id}`);
+    if (response.data?.data) {
+      response.data.data = transformClub(response.data.data);
+    }
     return response.data;
   },
 
