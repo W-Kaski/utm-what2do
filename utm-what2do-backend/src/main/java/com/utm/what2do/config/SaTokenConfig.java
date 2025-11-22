@@ -63,18 +63,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
                     SaHolder.getResponse().setHeader("Content-Type", "application/json;charset=UTF-8");
                     return "{\"code\":401,\"message\":\"" + e.getMessage() + "\",\"data\":null,\"timestamp\":" + System.currentTimeMillis() + "}";
                 })
-                // 前置函数：在每次认证函数之前执行
+                // 前置函数：在每次认证函数之前执行（CORS由CorsConfig处理）
                 .setBeforeAuth(obj -> {
-                    // 设置跨域响应头
-                    String origin = SaHolder.getRequest().getHeader("Origin");
-                    if (origin != null && (origin.equals("http://localhost:5173") || origin.equals("http://localhost:3000"))) {
-                        SaHolder.getResponse()
-                                .setHeader("Access-Control-Allow-Origin", origin)
-                                .setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-                                .setHeader("Access-Control-Allow-Headers", "*")
-                                .setHeader("Access-Control-Allow-Credentials", "true")
-                                .setHeader("Access-Control-Max-Age", "3600");
-                    }
+                    // CORS headers are now handled by CorsConfig with highest precedence
                 });
     }
 
