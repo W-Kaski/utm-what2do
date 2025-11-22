@@ -2,7 +2,9 @@ package com.utm.what2do.service;
 
 import com.utm.what2do.model.entity.Clubs;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.utm.what2do.model.dto.ClubUpdateDTO;
 import com.utm.what2do.model.vo.ClubDetailVO;
+import com.utm.what2do.model.vo.ClubMemberVO;
 
 import java.util.List;
 
@@ -32,4 +34,22 @@ public interface ClubsService extends IService<Clubs> {
      * @return 社团详情
      */
     ClubDetailVO getClubDetailBySlug(String slug);
+
+    /**
+     * 更新社团信息
+     * @param clubId 社团ID
+     * @param dto 更新数据
+     * @param userId 当前用户ID
+     * @return 更新后的社团详情
+     */
+    ClubDetailVO updateClub(Long clubId, ClubUpdateDTO dto, Long userId);
+
+    /**
+     * 获取社团成员列表
+     * @param clubId 社团ID
+     * @param role 筛选角色（可选）
+     * @param userId 当前用户ID
+     * @return 成员列表
+     */
+    List<ClubMemberVO> getClubMembers(Long clubId, String role, Long userId);
 }

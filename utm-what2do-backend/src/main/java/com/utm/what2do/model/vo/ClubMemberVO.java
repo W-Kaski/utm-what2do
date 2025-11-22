@@ -18,6 +18,9 @@ public class ClubMemberVO {
     private Long id;
     private Long clubId;
     private Long userId;
+    private String username;
+    private String displayName;
+    private String avatar;
     private String role;
     private String status;
     private LocalDateTime joinedAt;

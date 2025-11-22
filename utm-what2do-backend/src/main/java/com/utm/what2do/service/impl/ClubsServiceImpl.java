@@ -4,23 +4,27 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.utm.what2do.common.exception.BusinessException;
 import com.utm.what2do.common.response.StatusCode;
+import com.utm.what2do.constant.RoleConstants;
+import com.utm.what2do.mapper.ClubMembersMapper;
 import com.utm.what2do.mapper.ClubsMapper;
 import com.utm.what2do.mapper.EventsMapper;
-import com.utm.what2do.model.entity.Buildings;
-import com.utm.what2do.model.entity.Clubs;
-import com.utm.what2do.model.entity.Events;
+import com.utm.what2do.mapper.UsersMapper;
+import com.utm.what2do.model.dto.ClubUpdateDTO;
+import com.utm.what2do.model.entity.*;
 import com.utm.what2do.model.vo.ClubDetailVO;
+import com.utm.what2do.model.vo.ClubMemberVO;
 import com.utm.what2do.model.vo.EventCardVO;
 import com.utm.what2do.service.BuildingsService;
 import com.utm.what2do.service.ClubsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +40,9 @@ public class ClubsServiceImpl extends ServiceImpl<ClubsMapper, Clubs>
 
     private final EventsMapper eventsMapper;
     private final BuildingsService buildingsService;
+    private final ClubMembersMapper clubMembersMapper;
+    private final UsersMapper usersMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public List<Clubs> getAllClubs() {
@@ -71,6 +78,154 @@ public class ClubsServiceImpl extends ServiceImpl<ClubsMapper, Clubs>
         }
 
         return convertToDetailVO(club);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ClubDetailVO updateClub(Long clubId, ClubUpdateDTO dto, Long userId) {
+        // 1. 校验社团存在
+        Clubs club = this.getById(clubId);
+        if (club == null || club.getDeleted() == 1) {
+            throw new BusinessException(StatusCode.CLUB_NOT_FOUND);
+        }
+
+        // 2. 校验权限：必须是该社团的MANAGER或ADMIN
+        Users user = usersMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(StatusCode.USER_NOT_FOUND);
+        }
+
+        boolean isAdmin = RoleConstants.ADMIN.equals(user.getRole().toString());
+        if (!isAdmin) {
+            // 检查是否是该社团的Manager
+            LambdaQueryWrapper<ClubMembers> memberQuery = new LambdaQueryWrapper<>();
+            memberQuery.eq(ClubMembers::getClub_id, clubId)
+                       .eq(ClubMembers::getUser_id, userId)
+                       .eq(ClubMembers::getRole, "MANAGER")
+                       .eq(ClubMembers::getDeleted, 0);
+            if (clubMembersMapper.selectCount(memberQuery) == 0) {
+                throw new BusinessException(StatusCode.FORBIDDEN.getCode(), "无权修改此社团信息");
+            }
+        }
+
+        // 3. 校验slug唯一性
+        if (dto.getSlug() != null && !dto.getSlug().equals(club.getSlug())) {
+            LambdaQueryWrapper<Clubs> slugQuery = new LambdaQueryWrapper<>();
+            slugQuery.eq(Clubs::getSlug, dto.getSlug())
+                     .eq(Clubs::getDeleted, 0)
+                     .ne(Clubs::getId, clubId);
+            if (this.count(slugQuery) > 0) {
+                throw new BusinessException(StatusCode.BAD_REQUEST.getCode(), "Slug已被使用");
+            }
+            club.setSlug(dto.getSlug());
+        }
+
+        // 4. 更新字段
+        if (dto.getName() != null) {
+            club.setName(dto.getName());
+        }
+        if (dto.getTagline() != null) {
+            club.setTagline(dto.getTagline());
+        }
+        if (dto.getDescription() != null) {
+            club.setDescription(dto.getDescription());
+        }
+        if (dto.getCategory() != null) {
+            club.setCategory(dto.getCategory());
+        }
+        if (dto.getLogoUrl() != null) {
+            club.setLogo_url(dto.getLogoUrl());
+        }
+        if (dto.getCoverUrl() != null) {
+            club.setCover_url(dto.getCoverUrl());
+        }
+
+        club.setUpdated_at(new Date());
+        this.updateById(club);
+
+        // 5. 清除缓存
+        try {
+            redisTemplate.delete("club:" + clubId);
+        } catch (Exception e) {
+            log.warn("清除社团缓存失败: {}", e.getMessage());
+        }
+
+        log.info("社团信息更新成功: clubId={}, userId={}", clubId, userId);
+
+        return convertToDetailVO(club);
+    }
+
+    @Override
+    public List<ClubMemberVO> getClubMembers(Long clubId, String role, Long userId) {
+        // 1. 校验社团存在
+        Clubs club = this.getById(clubId);
+        if (club == null || club.getDeleted() == 1) {
+            throw new BusinessException(StatusCode.CLUB_NOT_FOUND);
+        }
+
+        // 2. 校验权限：必须是该社团的MANAGER或ADMIN
+        Users user = usersMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(StatusCode.USER_NOT_FOUND);
+        }
+
+        boolean isAdmin = RoleConstants.ADMIN.equals(user.getRole().toString());
+        if (!isAdmin) {
+            // 检查是否是该社团的Manager
+            LambdaQueryWrapper<ClubMembers> memberQuery = new LambdaQueryWrapper<>();
+            memberQuery.eq(ClubMembers::getClub_id, clubId)
+                       .eq(ClubMembers::getUser_id, userId)
+                       .eq(ClubMembers::getRole, "MANAGER")
+                       .eq(ClubMembers::getDeleted, 0);
+            if (clubMembersMapper.selectCount(memberQuery) == 0) {
+                throw new BusinessException(StatusCode.FORBIDDEN.getCode(), "无权查看社团成员");
+            }
+        }
+
+        // 3. 查询成员列表
+        LambdaQueryWrapper<ClubMembers> query = new LambdaQueryWrapper<>();
+        query.eq(ClubMembers::getClub_id, clubId)
+             .eq(ClubMembers::getDeleted, 0);
+        if (role != null && !role.isBlank()) {
+            query.eq(ClubMembers::getRole, role);
+        }
+        query.orderByDesc(ClubMembers::getJoined_at);
+
+        List<ClubMembers> members = clubMembersMapper.selectList(query);
+
+        // 4. 转换为VO并填充用户信息
+        List<ClubMemberVO> voList = new ArrayList<>();
+        for (ClubMembers member : members) {
+            ClubMemberVO vo = new ClubMemberVO();
+            vo.setId(member.getId());
+            vo.setClubId(member.getClub_id());
+            vo.setUserId(member.getUser_id());
+            vo.setRole(member.getRole() != null ? member.getRole().toString() : null);
+            vo.setStatus(member.getStatus() != null ? member.getStatus().toString() : null);
+
+            if (member.getJoined_at() != null) {
+                vo.setJoinedAt(LocalDateTime.ofInstant(
+                    member.getJoined_at().toInstant(), ZoneId.systemDefault()));
+            }
+            if (member.getCreated_at() != null) {
+                vo.setCreatedAt(LocalDateTime.ofInstant(
+                    member.getCreated_at().toInstant(), ZoneId.systemDefault()));
+            }
+
+            // 获取用户信息
+            Users memberUser = usersMapper.selectById(member.getUser_id());
+            if (memberUser != null) {
+                vo.setUsername(memberUser.getUsername());
+                vo.setDisplayName(memberUser.getDisplay_name());
+                vo.setAvatar(memberUser.getAvatar_url());
+            }
+
+            voList.add(vo);
+        }
+
+        log.info("获取社团成员: clubId={}, count={}", clubId, voList.size());
+
+        return voList;
     }
 
     /**

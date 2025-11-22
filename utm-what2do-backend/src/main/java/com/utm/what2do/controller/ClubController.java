@@ -4,11 +4,14 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.utm.what2do.annotation.CheckRole;
 import com.utm.what2do.common.response.ResultVO;
 import com.utm.what2do.constant.RoleConstants;
+import com.utm.what2do.model.dto.ClubUpdateDTO;
 import com.utm.what2do.model.entity.Clubs;
 import com.utm.what2do.model.vo.ClubDetailVO;
+import com.utm.what2do.model.vo.ClubMemberVO;
 import com.utm.what2do.service.ClubsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +56,33 @@ public class ClubController {
     public ResultVO<ClubDetailVO> getClubDetailById(@PathVariable Long id) {
         ClubDetailVO detail = clubsService.getClubDetail(id);
         return ResultVO.success(detail);
+    }
+
+    /**
+     * 更新社团信息
+     */
+    @Operation(summary = "更新社团信息", description = "社团管理员更新社团信息")
+    @CheckRole({RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @PutMapping("/id/{id}")
+    public ResultVO<ClubDetailVO> updateClub(
+            @PathVariable Long id,
+            @Valid @RequestBody ClubUpdateDTO dto) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        ClubDetailVO detail = clubsService.updateClub(id, dto, userId);
+        return ResultVO.success("社团信息更新成功", detail);
+    }
+
+    /**
+     * 获取社团成员列表
+     */
+    @Operation(summary = "获取社团成员", description = "获取社团成员列表（需要MANAGER或ADMIN权限）")
+    @CheckRole({RoleConstants.CLUB_MANAGER, RoleConstants.ADMIN})
+    @GetMapping("/id/{id}/members")
+    public ResultVO<List<ClubMemberVO>> getClubMembers(
+            @PathVariable Long id,
+            @RequestParam(required = false) String role) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        List<ClubMemberVO> members = clubsService.getClubMembers(id, role, userId);
+        return ResultVO.success(members);
     }
 }
