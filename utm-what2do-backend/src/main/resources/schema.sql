@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(64) NOT NULL,
     display_name VARCHAR(120) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    password_salt VARCHAR(32) NOT NULL,
     role ENUM('USER', 'CLUB_MANAGER', 'ADMIN') NOT NULL DEFAULT 'USER',
     avatar_url VARCHAR(512),
     cover_url VARCHAR(512),

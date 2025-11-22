@@ -1,6 +1,5 @@
 package com.utm.what2do.service.impl;
 
-import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,11 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,12 +49,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
     // 邮箱格式：基础校验
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
-    // BCrypt 哈希模式 (60字符)
-    private static final Pattern BCRYPT_PATTERN = Pattern.compile("^\\$2[aby]\\$\\d{2}\\$[./A-Za-z0-9]{53}$");
-    // 兼容旧数据: MD5 32位十六进制
-    private static final Pattern MD5_PATTERN = Pattern.compile("^[A-Fa-f0-9]{32}$");
-    // Legacy bootstrap password fallback (only used when password_hash is null)
-    private static final String LEGACY_BOOTSTRAP_PASSWORD = "Admin@123";
 
     // 使用@Lazy避免循环依赖
     public UsersServiceImpl(@Lazy FollowsService followsService, @Lazy ClubsService clubsService) {
@@ -113,9 +109,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         user.setEmail(email);
         user.setDisplay_name(displayName);
 
-        // 使用BCrypt加密密码
-        String hashedPassword = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
+        // 生成随机盐值并加密密码
+        String salt = generateSalt();
+        String hashedPassword = hashPassword(dto.getPassword(), salt);
         user.setPassword_hash(hashedPassword);
+        user.setPassword_salt(salt);
 
         // **安全修正：强制注册角色为 USER，CLUB_MANAGER角色通过后台分配**
         user.setRole(RoleConstants.USER);
@@ -158,45 +156,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
             throw new BusinessException(StatusCode.USER_NOT_FOUND);
         }
 
-        // 2. 验证密码，兼容历史数据
-        String storedHash = user.getPassword_hash();
-        boolean passwordMatch = false;
-        log.debug("登录调试: userId={}, hashPresent={}, hashLength={}", user.getId(),
-            storedHash != null, storedHash != null ? storedHash.length() : null);
-        if (storedHash != null && BCRYPT_PATTERN.matcher(storedHash).matches()) {
-            passwordMatch = BCrypt.checkpw(dto.getPassword(), storedHash);
-            log.debug("登录调试: userId={}, bcryptFormat=true, match={}", user.getId(), passwordMatch);
-        } else if (storedHash != null && MD5_PATTERN.matcher(storedHash).matches()) {
-            String md5 = DigestUtils.md5DigestAsHex(dto.getPassword().getBytes(StandardCharsets.UTF_8));
-            passwordMatch = storedHash.equalsIgnoreCase(md5);
-            log.debug("登录调试: userId={}, md5Format=true, match={}", user.getId(), passwordMatch);
-            if (passwordMatch) {
-                rehashPassword(user, dto.getPassword());
-            }
-        } else if (storedHash != null) {
-            // 兼容旧的明文存储，匹配后自动升级到BCrypt
-            passwordMatch = storedHash.equals(dto.getPassword());
-            log.debug("登录调试: userId={}, plainFormat=true, match={}", user.getId(), passwordMatch);
-            if (passwordMatch) {
-                rehashPassword(user, dto.getPassword());
-            }
-        } else {
-            log.warn("登录调试: userId={}, storedHash为空", user.getId());
-            if (LEGACY_BOOTSTRAP_PASSWORD.equals(dto.getPassword())) {
-                log.warn("登录调试: userId={}, 使用内置 bootstrap 密码匹配成功，准备补写哈希", user.getId());
-                passwordMatch = true;
-                rehashPassword(user, dto.getPassword());
-            }
-        }
+        // 2. 验证密码
+        String hashedInput = hashPassword(dto.getPassword(), user.getPassword_salt());
+        boolean passwordMatch = hashedInput.equals(user.getPassword_hash());
+        log.info("密码验证: username={}, match={}", dto.getUsername(), passwordMatch);
 
         if (!passwordMatch) {
-            log.warn("登录调试: userId={}, 所有格式匹配失败", user.getId());
-        } else {
-            log.debug("登录调试: userId={}, 密码验证通过", user.getId());
-        }
-
-        if (!passwordMatch) {
-            log.warn("密码验证失败: username={}", dto.getUsername());
             throw new BusinessException(StatusCode.PASSWORD_ERROR);
         }
 
@@ -217,14 +182,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         return result;
     }
 
-    private void rehashPassword(Users user, String rawPassword) {
-        String newHash = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
-        user.setPassword_hash(newHash);
-        this.updateById(user);
-        log.info("自动升级用户密码哈希格式: userId={}", user.getId());
-    }
-
-    // (其余方法保持不变...)
     @Override
     public UserInfoVO getUserInfo(Long userId) {
         Users user = this.getById(userId);
@@ -373,5 +330,29 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         }
 
         return vo;
+    }
+
+    /**
+     * 生成随机盐值
+     */
+    private String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+    }
+
+    /**
+     * 使用SHA-256和盐值哈希密码
+     */
+    private String hashPassword(String password, String salt) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String saltedPassword = password + salt;
+            byte[] hash = digest.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
     }
 }

@@ -35,9 +35,14 @@ public class Users {
     private String display_name;
 
     /**
-     * 
+     *
      */
     private String password_hash;
+
+    /**
+     * 密码盐值
+     */
+    private String password_salt;
 
     /**
      * 
