@@ -70,10 +70,24 @@
       </button>
     </div>
 
-    <section v-if="filteredEvents.length" class="grid">
+    <!-- Loading state -->
+    <div v-if="eventStore.loading" class="loading-state">
+      <p>Loading events...</p>
+    </div>
+
+    <!-- Error state -->
+    <div v-else-if="eventStore.error" class="error-state">
+      <h3>Failed to load events</h3>
+      <p>{{ eventStore.error }}</p>
+      <button type="button" @click="retryFetch">Retry</button>
+    </div>
+
+    <!-- Events grid -->
+    <section v-else-if="filteredEvents.length" class="grid">
       <EventCard v-for="event in filteredEvents" :key="event.id" :event="event" />
     </section>
 
+    <!-- Empty state -->
     <div v-else class="empty-state">
       <h3>No events match yet</h3>
       <p>Try changing keywords or filters, or check back for new activities soon.</p>
@@ -252,6 +266,11 @@ const resetAll = () => {
     .replace({ name: 'events', query: {} })
     .catch(() => {});
 };
+
+const retryFetch = () => {
+  eventStore.clearError();
+  eventStore.fetchEvents();
+};
 </script>
 
 <style scoped>
@@ -400,6 +419,8 @@ const resetAll = () => {
   gap: 1.25rem;
 }
 
+.loading-state,
+.error-state,
 .empty-state {
   background: #fff;
   border-radius: 1.5rem;
@@ -411,6 +432,21 @@ const resetAll = () => {
   gap: 0.75rem;
 }
 
+.loading-state p {
+  color: #64748b;
+}
+
+.error-state h3 {
+  color: #dc2626;
+  margin: 0;
+}
+
+.error-state p {
+  color: #64748b;
+  margin: 0;
+}
+
+.error-state button,
 .empty-state button {
   border: none;
   border-radius: 999px;

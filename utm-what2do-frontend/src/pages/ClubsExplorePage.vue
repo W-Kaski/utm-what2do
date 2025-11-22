@@ -39,7 +39,20 @@
         <button type="button" @click="resetFilters">Reset</button>
       </div>
 
-      <div class="club-list">
+      <!-- Loading state -->
+      <div v-if="clubStore.loading" class="loading-state">
+        <p>Loading clubs...</p>
+      </div>
+
+      <!-- Error state -->
+      <div v-else-if="clubStore.error" class="error-state">
+        <h3>Failed to load clubs</h3>
+        <p>{{ clubStore.error }}</p>
+        <button type="button" @click="retryFetch">Retry</button>
+      </div>
+
+      <!-- Club list -->
+      <div v-else-if="filteredClubs.length" class="club-list">
         <article
           v-for="club in filteredClubs"
           :key="club.id"
@@ -62,6 +75,12 @@
             <p><strong>{{ club.stats.events }}</strong><span>Events</span></p>
           </div>
         </article>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="empty-state">
+        <h3>No clubs found</h3>
+        <p>Try adjusting your search or filters.</p>
       </div>
     </section>
   </div>
@@ -125,6 +144,11 @@ const resetFilters = () => {
 
 const goToClub = (id) => {
   router.push({ name: 'club-detail', params: { id } });
+};
+
+const retryFetch = () => {
+  clubStore.clearError();
+  clubStore.fetchClubs();
 };
 </script>
 
@@ -321,6 +345,45 @@ h1 {
   display: block;
   font-size: 1.2rem;
   color: #0f172a;
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  border-radius: 1rem;
+  background: #f8fafc;
+}
+
+.loading-state p {
+  color: #64748b;
+  margin: 0;
+}
+
+.error-state h3,
+.empty-state h3 {
+  margin: 0 0 0.5rem;
+}
+
+.error-state h3 {
+  color: #dc2626;
+}
+
+.error-state p,
+.empty-state p {
+  color: #64748b;
+  margin: 0;
+}
+
+.error-state button {
+  margin-top: 1rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.5rem;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
 }
 
 .sr-only {
