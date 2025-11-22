@@ -44,8 +44,9 @@
               </td>
               <td>
                 <div class="action-buttons">
-                  <button v-if="event.status === 'pending'" @click="approveEvent(event)" class="approve" title="Approve">✓</button>
-                  <button v-if="event.status === 'pending'" @click="rejectEvent(event)" class="reject" title="Reject">✗</button>
+                  <button @click="cycleStatus(event)" :class="['status-btn', event.status]" :title="getStatusTitle(event.status)">
+                    {{ event.status === 'approved' ? '🔓' : '🔒' }}
+                  </button>
                   <button @click="viewEvent(event)" title="View">👁️</button>
                   <button @click="deleteEvent(event)" class="delete" title="Delete">🗑️</button>
                 </div>
@@ -77,21 +78,28 @@ const filteredEvents = computed(() => {
   return events.value.filter(event => event.status === statusFilter.value);
 });
 
-const approveEvent = async (event) => {
-  try {
-    await apiClient.put(`/admin/events/${event.id}/status`, { status: 'approved' });
-    event.status = 'approved';
-  } catch (err) {
-    event.status = 'approved';
-  }
+const getNextStatus = (currentStatus) => {
+  const statusCycle = ['pending', 'approved', 'rejected'];
+  const currentIndex = statusCycle.indexOf(currentStatus);
+  return statusCycle[(currentIndex + 1) % statusCycle.length];
 };
 
-const rejectEvent = async (event) => {
+const getStatusTitle = (status) => {
+  const titles = {
+    pending: 'Click to approve',
+    approved: 'Click to reject',
+    rejected: 'Click to set pending'
+  };
+  return titles[status] || 'Change status';
+};
+
+const cycleStatus = async (event) => {
+  const newStatus = getNextStatus(event.status);
   try {
-    await apiClient.put(`/admin/events/${event.id}/status`, { status: 'rejected' });
-    event.status = 'rejected';
+    await apiClient.put(`/admin/events/${event.id}/status`, { status: newStatus });
+    event.status = newStatus;
   } catch (err) {
-    event.status = 'rejected';
+    event.status = newStatus;
   }
 };
 
@@ -231,12 +239,24 @@ th {
   background: #e2e8f0;
 }
 
-.action-buttons button.approve:hover {
+.action-buttons button.status-btn {
+  transition: background 0.2s ease;
+}
+
+.action-buttons button.status-btn.pending {
+  background: #fef3c7;
+}
+
+.action-buttons button.status-btn.approved {
   background: #dcfce7;
 }
 
-.action-buttons button.reject:hover {
+.action-buttons button.status-btn.rejected {
   background: #fee2e2;
+}
+
+.action-buttons button.status-btn:hover {
+  filter: brightness(0.95);
 }
 
 .action-buttons button.delete:hover {
