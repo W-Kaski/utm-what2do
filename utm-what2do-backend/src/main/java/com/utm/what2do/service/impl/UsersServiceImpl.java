@@ -140,35 +140,32 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class) // <-- 登录方法添加事务
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> login(UserLoginDTO dto) {
-        // 1. 根据用户名查询用户
+        // 1. 对用户传递的密码进行加密
+        String encryptPassword = getEncryptPassword(dto.getPassword());
+
+        // 2. 查询数据库中的用户是否存在
         LambdaQueryWrapper<Users> query = new LambdaQueryWrapper<>();
         query.eq(Users::getUsername, dto.getUsername());
+        query.eq(Users::getPassword_hash, encryptPassword);
         Users user = this.getOne(query);
 
-        log.info("登录尝试: username={}, userFound={}", dto.getUsername(), user != null);
-
-        if (user == null || user.getDeleted() == 1) {
-            throw new BusinessException(StatusCode.USER_NOT_FOUND);
+        // 不存在，抛异常
+        if (user == null) {
+            log.info("登录失败: 用户名或密码错误, username={}", dto.getUsername());
+            throw new BusinessException(StatusCode.PASSWORD_ERROR);
         }
 
-        // 2. 验证密码
-        String encryptPassword = getEncryptPassword(dto.getPassword());
-        String storedPassword = user.getPassword_hash();
-        log.info("密码对比: input=[{}], stored=[{}], equal={}",
-                encryptPassword, storedPassword, encryptPassword.equals(storedPassword));
-
-        if (!encryptPassword.equals(storedPassword)) {
-            log.info("密码验证失败: username={}", dto.getUsername());
-            throw new BusinessException(StatusCode.PASSWORD_ERROR);
+        if (user.getDeleted() == 1) {
+            throw new BusinessException(StatusCode.USER_NOT_FOUND);
         }
 
         // 3. 使用Sa-Token登录
         StpUtil.login(user.getId());
         StpUtil.getSession().set("role", user.getRole());
 
-        // 4. 更新最后登录时间 (在事务内)
+        // 4. 更新最后登录时间
         user.setLast_login_at(new Date());
         this.updateById(user);
 
