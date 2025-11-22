@@ -34,7 +34,8 @@
               :aria-expanded="menuOpen"
               @click="toggleMenu"
             >
-              <span class="avatar-initials">{{ userInitials }}</span>
+              <img v-if="userStore.avatar" :src="userStore.avatar" :alt="userStore.name" class="avatar-img" />
+              <span v-else class="avatar-initials">{{ userInitials }}</span>
               <span class="status-dot" aria-hidden="true"></span>
             </button>
 
@@ -251,6 +252,13 @@ onBeforeUnmount(() => {
   position: relative;
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
   cursor: pointer;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .avatar-initials {
