@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 
 import { useEventStore } from '@/stores/events';
@@ -131,7 +131,21 @@ const eventStore = useEventStore();
 
 const userStore = useUserStore();
 
-const event = computed(() => eventStore.events.find((item) => item.id === route.params.id));
+// Fetch event on mount
+onMounted(() => {
+  if (route.params.id) {
+    eventStore.fetchEventById(route.params.id);
+  }
+});
+
+// Watch for route parameter changes
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    eventStore.fetchEventById(newId);
+  }
+});
+
+const event = computed(() => eventStore.selectedEvent);
 
 const buildDateTime = (date, time) => {
   if (!date || !time) return null;

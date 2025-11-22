@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PostCard from '@/components/PostCard.vue';
 import { usePostStore } from '@/stores/posts';
@@ -51,7 +51,21 @@ const route = useRoute();
 const router = useRouter();
 const postStore = usePostStore();
 
-const post = computed(() => postStore.getPostById(route.params.id));
+// Fetch post on mount
+onMounted(() => {
+  if (route.params.id) {
+    postStore.fetchPostById(route.params.id);
+  }
+});
+
+// Watch for route parameter changes
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    postStore.fetchPostById(newId);
+  }
+});
+
+const post = computed(() => postStore.selectedPost);
 const commentContent = ref('');
 
 const submitComment = () => {

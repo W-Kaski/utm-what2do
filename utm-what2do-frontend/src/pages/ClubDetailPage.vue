@@ -106,14 +106,29 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
-import { findClubById } from '@/data/clubs';
+import { useClubStore } from '@/stores/clubs';
 
 const route = useRoute();
+const clubStore = useClubStore();
 
-const club = computed(() => findClubById(route.params.id));
+// Fetch club on mount
+onMounted(() => {
+  if (route.params.id) {
+    clubStore.fetchClubById(route.params.id);
+  }
+});
+
+// Watch for route parameter changes
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    clubStore.fetchClubById(newId);
+  }
+});
+
+const club = computed(() => clubStore.selectedClub);
 
 const heroStyle = computed(() => {
   if (!club.value?.coverImage) return {};
