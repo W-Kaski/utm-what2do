@@ -155,7 +155,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
 
         // 2. 验证密码
         String encryptPassword = getEncryptPassword(dto.getPassword());
-        if (!encryptPassword.equals(user.getPassword_hash())) {
+        String storedPassword = user.getPassword_hash();
+        log.info("密码对比: input=[{}], stored=[{}], equal={}",
+                encryptPassword, storedPassword, encryptPassword.equals(storedPassword));
+
+        if (!encryptPassword.equals(storedPassword)) {
             log.info("密码验证失败: username={}", dto.getUsername());
             throw new BusinessException(StatusCode.PASSWORD_ERROR);
         }
