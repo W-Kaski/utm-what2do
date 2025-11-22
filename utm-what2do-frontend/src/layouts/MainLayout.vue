@@ -14,7 +14,6 @@
           <RouterLink :to="{ name: 'feed' }" :class="{ 'router-link-active': communityActive }">
             Community
           </RouterLink>
-          <RouterLink to="/profile">Profile</RouterLink>
         </nav>
 
         <div class="header-actions">
@@ -50,8 +49,8 @@
                 <strong>{{ userStore.name }}</strong>
               </div>
               <div class="dropdown__body">
-                <button type="button" role="menuitem" @click="goHome">
-                  Home
+                <button type="button" role="menuitem" @click="goProfile">
+                  Profile
                 </button>
                 <button type="button" role="menuitem" class="logout-btn" @click="handleLogout">Log out</button>
               </div>
@@ -106,9 +105,9 @@ const handleOutsideClick = (event) => {
   }
 };
 
-const goHome = () => {
+const goProfile = () => {
   closeMenu();
-  router.push({ name: 'home' });
+  router.push({ name: 'profile' });
 };
 
 const handleLogout = async () => {
