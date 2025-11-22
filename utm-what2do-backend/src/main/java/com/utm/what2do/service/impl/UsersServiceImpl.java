@@ -133,12 +133,16 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         query.eq(Users::getUsername, dto.getUsername());
         Users user = this.getOne(query);
 
+        log.info("登录尝试: username={}, userFound={}", dto.getUsername(), user != null);
+
         if (user == null || user.getDeleted() == 1) {
             throw new BusinessException(StatusCode.USER_NOT_FOUND);
         }
 
         // 2. 验证密码
         boolean passwordMatch = BCrypt.checkpw(dto.getPassword(), user.getPassword_hash());
+        log.info("密码验证: username={}, match={}", dto.getUsername(), passwordMatch);
+
         if (!passwordMatch) {
             throw new BusinessException(StatusCode.PASSWORD_ERROR);
         }
