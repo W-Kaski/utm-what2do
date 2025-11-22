@@ -162,7 +162,8 @@ public class BuildingsServiceImpl extends ServiceImpl<BuildingsMapper, Buildings
             .lat(building.getLat())
             .lng(building.getLng())
             .campusZone(building.getCampus_zone())
-            .category(building.getCategory())
+            .category(building.getCategory() != null ?
+                com.utm.what2do.model.enums.BuildingCategory.fromCode(building.getCategory()) : null)
             .createdAt(building.getCreated_at() != null ?
                 LocalDateTime.ofInstant(building.getCreated_at().toInstant(), ZoneId.systemDefault()) : null)
             .updatedAt(building.getUpdated_at() != null ?
